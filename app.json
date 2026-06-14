@@ -1,0 +1,45 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/profile/index",
+    "pages/group-detail/index",
+    "pages/post-detail/index",
+    "pages/publish/index",
+    "pages/my-posts/index",
+    "pages/user-info-edit/index",
+    "pages/init-data/index",
+    "pages/banner-detail/index",
+    "pages/help/index",
+    "pages/community/index"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "拼拼",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#E8F4F8"
+  },
+  "tabBar": {
+    "custom": false,
+    "color": "#999999",
+    "selectedColor": "#333333",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于查找附近的停车场"
+    }
+  },
+  "requiredPrivateInfos": [],
+  "cloud": true
+}

@@ -1,0 +1,18 @@
+.page { min-height: 100vh; background: linear-gradient(180deg, #E8F4F8 0%, #F0F8FF 50%, #E8F4F8 100%); }
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24rpx 32rpx; background: #fff; border-bottom: 1rpx solid #E5E7EB;
+}
+.back-btn { width: 64rpx; height: 64rpx; border-radius: 50%; background: #F3F4F6; display: flex; align-items: center; justify-content: center; }
+.back-icon { font-size: 36rpx; color: #555; font-weight: bold; }
+.header-title { font-size: 32rpx; font-weight: bold; color: #333; }
+.header-placeholder { width: 64rpx; }
+.loading-wrap { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.loading-text { color: #999; font-size: 28rpx; }
+.content { padding: 24rpx; }
+.card { background: #fff; border-radius: 20rpx; padding: 32rpx; }
+.banner-cover-img { width: 100%; border-radius: 12rpx; margin-bottom: 20rpx; display: block; }
+.banner-title { font-size: 36rpx; font-weight: bold; color: #333; display: block; margin-bottom: 12rpx; }
+.banner-subtitle { font-size: 24rpx; color: #888; display: block; margin-bottom: 20rpx; }
+.banner-img { width: 100%; border-radius: 12rpx; margin-bottom: 20rpx; }
+.banner-content { font-size: 28rpx; color: #555; line-height: 1.8; }

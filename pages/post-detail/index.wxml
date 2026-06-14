@@ -1,0 +1,148 @@
+<view class="page">
+  <!-- 头部导航 -->
+  <view class="header">
+    <view class="back-btn" bindtap="onBack">
+      <text class="back-icon">‹</text>
+    </view>
+    <text class="header-title">详情</text>
+    <view wx:if="{{!loading && isAuthor}}" class="action-btn blue" bindtap="onEdit">
+      <text>⚙</text>
+    </view>
+    <view wx:else class="header-placeholder"></view>
+  </view>
+
+  <!-- loading 骨架屏 -->
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view wx:else class="content">
+    <!-- 主要信息卡片 -->
+    <view class="card main-card">
+      <view class="type-tags">
+        <view class="type-tag blue">{{typeLabel}}</view>
+        <view wx:if="{{post.category}}" class="type-tag gray">{{post.category}}</view>
+      </view>
+      
+      <text class="post-title">{{post.title}}</text>
+      
+      <view wx:if="{{post.price}}" class="price-box">
+        <text class="price-label">转让价</text>
+        <text class="price-value">¥{{post.price}}</text>
+        <text wx:if="{{post.type === 'transfer' && post.originalPrice}}" class="price-original">原价 ¥{{post.originalPrice}}</text>
+        <text wx:elif="{{post.type === 'transfer'}}" class="price-unit">/月</text>
+      </view>
+      
+      <!-- 所在区域 -->
+      <view wx:if="{{displayRegionFormatted}}" class="meta-item">
+        <view class="meta-icon-wrap">
+          <image class="meta-svg-icon" src="/assets/icons/location.svg" mode="aspectFit" />
+        </view>
+        <text class="meta-text">{{displayRegionFormatted}}</text>
+      </view>
+      <!-- 有效期 单独一行 -->
+      <view wx:if="{{validPeriodText}}" class="meta-item">
+        <view class="meta-icon-wrap">
+          <image class="meta-svg-icon" src="/assets/icons/calendar.svg" mode="aspectFit" />
+        </view>
+        <text class="meta-text">{{validPeriodText}}</text>
+      </view>
+    </view>
+
+    <!-- 图片展示 -->
+    <view wx:if="{{post.images && post.images.length > 0}}" class="card images-card">
+      <text class="card-title">实物图片</text>
+      <view class="images-grid">
+        <view 
+          wx:for="{{post.images}}" 
+          wx:key="index" 
+          class="image-item"
+          bindtap="onPreviewImage"
+          data-index="{{index}}"
+        >
+          <image class="detail-image" src="{{item}}" mode="widthFix" />
+        </view>
+      </view>
+    </view>
+
+    <!-- 详细描述 -->
+    <view class="card desc-card">
+      <text class="card-title">详细描述</text>
+      <rich-text nodes="{{descHtml}}" class="desc-text"></rich-text>
+    </view>
+
+    <!-- 位置信息 -->
+    <view wx:if="{{detailsList.length > 0}}" class="card details-card">
+      <text class="card-title">位置信息</text>
+      <view class="details-list">
+        <view wx:for="{{detailsList}}" wx:key="index" class="detail-item">
+          <text class="detail-key">{{item.key}}</text>
+          <text class="detail-value">{{item.value}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 发布者信息 -->
+    <view wx:if="{{post.publisher}}" class="card publisher-card">
+      <text class="card-title">发布者信息</text>
+      
+      <view class="publisher-info">
+        <view class="publisher-avatar">
+          <image class="avatar-svg" src="/assets/icons/user.svg" mode="aspectFit" />
+        </view>
+        <view class="publisher-detail">
+          <text class="publisher-name">{{post.publisher.name}}</text>
+          <text class="publisher-type">个人发布</text>
+        </view>
+      </view>
+
+      <view class="contact-list">
+        <view class="contact-item green">
+          <view class="contact-left">
+            <view class="contact-icon green-bg">
+              <image class="contact-svg" src="/assets/icons/message.svg" mode="aspectFit" />
+            </view>
+            <view class="contact-info">
+              <text class="contact-label">微信号</text>
+              <text class="contact-value">{{post.publisher.wechat}}</text>
+            </view>
+          </view>
+          <view class="contact-btn" bindtap="onCopyWechat">复制</view>
+        </view>
+
+        <view wx:if="{{post.publisher.phone}}" class="contact-item blue">
+          <view class="contact-left">
+            <view class="contact-icon blue-bg">📞</view>
+            <view class="contact-info">
+              <text class="contact-label">手机号</text>
+              <text class="contact-value">{{post.publisher.phone}}</text>
+            </view>
+          </view>
+          <view class="contact-btn blue-btn" bindtap="onCall">拨打</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 温馨提示 -->
+    <view class="tips-box">
+      <text class="tips-title">温馨提示</text>
+      <text class="tips-item">• 请核实卖家/发布者身份，谨防诈骗</text>
+      <text class="tips-item">• 交易时建议当面验货，确认无误后再付款</text>
+      <text class="tips-item">• 不要提前支付定金或转账，保护个人财产安全</text>
+    </view>
+  </view>
+
+  <!-- 底部固定栏 -->
+  <view wx:if="{{!loading}}" class="bottom-bar">
+    <view wx:if="{{isAuthor}}" class="author-actions">
+      <view class="btn-edit" bindtap="onEdit">
+        <text class="btn-icon">✏️</text>
+        <text>编辑帖子</text>
+      </view>
+      <view class="btn-delete" catchtap="onDeletePost">删除</view>
+    </view>
+    <view wx:else class="user-actions">
+      <view class="contact-btn-full" bindtap="onCopyContact">复制联系方式</view>
+    </view>
+  </view>
+</view>

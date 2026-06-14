@@ -1,0 +1,179 @@
+/* 全局样式 */
+page {
+  background: linear-gradient(180deg, #E8F4F8 0%, #F0F8FF 50%, #E8F4F8 100%);
+  min-height: 100vh;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+  text-rendering: geometricPrecision;
+}
+
+/* emoji 表情清晰度 */
+.icon-emoji,
+.icon-char,
+.emoji {
+  line-height: 1;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Android Emoji", "Twitter Emoji", sans-serif;
+  text-rendering: auto;
+}
+
+.container {
+  padding-bottom: 120rpx;
+}
+
+/* 卡片通用样式 */
+.card {
+  background: #ffffff;
+  border-radius: 28rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background: linear-gradient(135deg, #FFE500 0%, #FEE500 50%, #FFD700 100%);
+  color: #333333;
+  border-radius: 50rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 12rpx rgba(255, 215, 0, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 2rpx 8rpx rgba(255, 215, 0, 0.3);
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #666666;
+  border-radius: 50rpx;
+}
+
+/* 标签样式 */
+.tag {
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+}
+
+.tag-yellow {
+  background: #FEE500;
+  color: #333333;
+}
+
+.tag-blue {
+  background: #E8F4F8;
+  color: #666666;
+}
+
+.tag-red {
+  background: #FEE2E2;
+  color: #EF4444;
+}
+
+/* 圆角头像 */
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 弹性布局 */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: 16rpx;
+}
+
+.gap-3 {
+  gap: 24rpx;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* 文本样式 */
+.text-sm {
+  font-size: 24rpx;
+}
+
+.text-base {
+  font-size: 28rpx;
+}
+
+.text-lg {
+  font-size: 32rpx;
+}
+
+.text-xl {
+  font-size: 36rpx;
+}
+
+.text-2xl {
+  font-size: 40rpx;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-gray-500 {
+  color: #999999;
+}
+
+.text-gray-600 {
+  color: #666666;
+}
+
+.text-gray-700 {
+  color: #555555;
+}
+
+.text-gray-900 {
+  color: #333333;
+}
+
+.text-orange-500 {
+  color: #FF6B35;
+}
+
+.text-red-500 {
+  color: #EF4444;
+}
+
+.text-blue-500 {
+  color: #3B82F6;
+}
+
+/* 安全区域 */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}

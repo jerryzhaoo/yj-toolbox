@@ -1,0 +1,15 @@
+# 微信开发者工具
+project.private.config.json
+.DS_Store
+
+# 依赖
+node_modules/
+
+# 云函数 node_modules
+cloudfunctions/*/node_modules/
+
+# 日志
+*.log
+
+# 系统文件
+Thumbs.db

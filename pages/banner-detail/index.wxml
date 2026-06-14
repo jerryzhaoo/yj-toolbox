@@ -1,0 +1,16 @@
+<view class="page">
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text class="loading-text">加载中...</text>
+  </view>
+  <view wx:else class="content">
+    <view class="card">
+      <image wx:if="{{banner.bannerImage}}" class="banner-cover-img" src="{{banner.bannerImage}}" mode="widthFix" />
+      <text class="banner-title">{{banner.title}}</text>
+      <text wx:if="{{banner.subtitle}}" class="banner-subtitle">{{banner.subtitle}}</text>
+      <view wx:if="{{banner.images && banner.images.length > 0}}" class="banner-images">
+        <image wx:for="{{banner.images}}" wx:for-item="img" wx:key="index" class="banner-img" src="{{img}}" mode="widthFix" />
+      </view>
+      <text class="banner-content">{{banner.content}}</text>
+    </view>
+  </view>
+</view>

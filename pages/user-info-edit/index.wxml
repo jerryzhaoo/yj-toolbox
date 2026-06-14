@@ -1,0 +1,308 @@
+<view class="page">
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <!-- 头像 -->
+    <view class="avatar-section" bindtap="onChooseAvatar">
+      <view class="avatar-wrap">
+        <block wx:if="{{formData.avatar}}">
+          <image class="avatar-img" src="{{formData.avatar}}" mode="aspectFill" />
+        </block>
+        <block wx:else>
+          <view class="avatar-placeholder">
+            <text class="avatar-icon">👤</text>
+          </view>
+        </block>
+        <block wx:if="{{isEditing}}">
+          <view class="avatar-edit-icon">✎</view>
+        </block>
+      </view>
+      <view class="avatar-tip" wx:if="{{isEditing}}">
+        <text class="tip-text">点击更换头像</text>
+      </view>
+    </view>
+
+    <!-- 基本信息 -->
+    <view class="info-grid">
+      <!-- 昵称 -->
+      <view class="info-item">
+        <text class="info-label">昵称</text>
+        <block wx:if="{{isEditing}}">
+          <input 
+            class="info-input" 
+            type="text"
+            placeholder="请输入昵称"
+            value="{{formData.name}}"
+            data-field="name"
+            bindinput="onInput"
+          />
+        </block>
+        <block wx:else>
+          <text class="info-value">{{formData.name || '未设置'}}</text>
+        </block>
+      </view>
+
+      <!-- 性别 -->
+      <view class="info-item">
+        <text class="info-label">性别</text>
+        <block wx:if="{{isEditing}}">
+          <view class="gender-select">
+            <view 
+              class="gender-btn {{formData.gender === '男' ? 'active' : ''}}"
+              bindtap="onSelectGender"
+              data-gender="男"
+            >
+              <text>♂ 男</text>
+            </view>
+            <view 
+              class="gender-btn {{formData.gender === '女' ? 'active' : ''}}"
+              bindtap="onSelectGender"
+              data-gender="女"
+            >
+              <text>♀ 女</text>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <text class="info-value">{{formData.gender || '未设置'}}</text>
+        </block>
+      </view>
+
+      <!-- 生日 -->
+      <view class="info-item">
+        <text class="info-label">生日</text>
+        <block wx:if="{{isEditing}}">
+          <picker mode="date" value="{{formData.birthday}}" bindchange="onBirthdayChange">
+            <view class="info-value birthday-picker">
+              <text>{{formData.birthday || '请选择生日'}}</text>
+              <text class="arrow">›</text>
+            </view>
+          </picker>
+        </block>
+        <block wx:else>
+          <text class="info-value">{{formData.birthday || '未设置'}}</text>
+        </block>
+      </view>
+    </view>
+  </view>
+
+  <!-- 详细信息卡片 -->
+  <view class="detail-card">
+    <view class="card-header">
+      <text class="card-title">详细信息</text>
+    </view>
+    
+    <view class="form-row">
+      <text class="form-label">真实姓名</text>
+      <block wx:if="{{isEditing}}">
+        <input 
+          class="form-input" 
+          type="text"
+          placeholder="请输入真实姓名"
+          value="{{formData.realName}}"
+          data-field="realName"
+          bindinput="onInput"
+        />
+      </block>
+      <block wx:else>
+        <text class="form-value {{formData.realName ? '' : 'placeholder'}}">{{formData.realName || '未填写'}}</text>
+      </block>
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">手机号</text>
+      <block wx:if="{{isEditing}}">
+        <input 
+          class="form-input" 
+          type="tel"
+          placeholder="请输入手机号"
+          value="{{formData.phone}}"
+          data-field="phone"
+          bindinput="onInput"
+        />
+      </block>
+      <block wx:else>
+        <text class="form-value">{{formData.phone || '未填写'}}</text>
+      </block>
+    </view>
+
+    <view class="form-row">
+      <text class="form-label">车牌号</text>
+      <block wx:if="{{isEditing}}">
+        <input 
+          class="form-input" 
+          type="text"
+          placeholder="请输入车牌号"
+          value="{{formData.carNumber}}"
+          data-field="carNumber"
+          maxlength="8"
+          bindinput="onInput"
+        />
+      </block>
+      <block wx:else>
+        <text class="form-value {{formData.carNumber ? '' : 'placeholder'}}">{{formData.carNumber || '未填写'}}</text>
+      </block>
+    </view>
+
+    <view class="form-row last">
+      <text class="form-label">微信号</text>
+      <block wx:if="{{isEditing}}">
+        <input 
+          class="form-input" 
+          type="text"
+          placeholder="请输入微信号"
+          value="{{formData.wechat}}"
+          data-field="wechat"
+          bindinput="onInput"
+        />
+      </block>
+      <block wx:else>
+        <text class="form-value {{formData.wechat ? '' : 'placeholder'}}">{{formData.wechat || '未填写'}}</text>
+      </block>
+    </view>
+  </view>
+
+  <!-- 发票信息卡片 -->
+  <view class="detail-card">
+    <view class="card-header">
+      <text class="card-title">发票信息</text>
+    </view>
+    
+    <view class="form-row">
+      <text class="form-label {{formData.needInvoice ? '' : 'off'}}">{{formData.needInvoice ? '需要发票' : '不需要发票'}}</text>
+      <view 
+        class="switch-btn {{formData.needInvoice ? 'on' : 'off'}} {{isEditing ? '' : 'disabled'}}"
+        bindtap="{{isEditing ? 'onToggleInvoice' : ''}}"
+      >
+        <view class="switch-handle"></view>
+      </view>
+    </view>
+
+    <block wx:if="{{formData.needInvoice}}">
+      <view class="form-row">
+        <text class="form-label"><text class="required">*</text>公司名称</text>
+        <block wx:if="{{isEditing}}">
+          <input 
+            class="form-input" 
+            type="text"
+            placeholder="请输入公司名称"
+            value="{{formData.companyName}}"
+            data-field="companyName"
+            bindinput="onInput"
+          />
+        </block>
+        <block wx:else>
+          <text class="form-value {{formData.companyName ? '' : 'placeholder'}}">{{formData.companyName || '未填写'}}</text>
+        </block>
+      </view>
+
+      <view class="form-row">
+        <text class="form-label">发票类型</text>
+        <block wx:if="{{isEditing}}">
+          <view class="invoice-type-select">
+            <view 
+              class="invoice-type-btn {{formData.invoiceType === '普票' ? 'active' : ''}}"
+              bindtap="onSelectInvoiceType"
+              data-type="普票"
+            >
+              <text>普票</text>
+            </view>
+            <view 
+              class="invoice-type-btn {{formData.invoiceType === '专票' ? 'active' : ''}}"
+              bindtap="onSelectInvoiceType"
+              data-type="专票"
+            >
+              <text>专票</text>
+            </view>
+          </view>
+        </block>
+        <block wx:else>
+          <text class="form-value">{{formData.invoiceType || '普票'}}</text>
+        </block>
+      </view>
+
+      <view class="form-row last">
+        <text class="form-label"><text class="required">*</text>税号</text>
+        <block wx:if="{{isEditing}}">
+          <input 
+            class="form-input" 
+            type="text"
+            placeholder="请输入税号"
+            value="{{formData.taxNumber}}"
+            data-field="taxNumber"
+            bindinput="onInput"
+          />
+        </block>
+        <block wx:else>
+          <text class="form-value {{formData.taxNumber ? '' : 'placeholder'}}">{{formData.taxNumber || '未填写'}}</text>
+        </block>
+      </view>
+      <!-- 接收邮箱 -->
+      <view class="form-row last">
+        <text class="form-label">接收邮箱</text>
+        <block wx:if="{{isEditing}}">
+          <input 
+            class="form-input" 
+            type="text"
+            placeholder="电子邮箱地址"
+            value="{{formData.receiveEmail}}"
+            data-field="receiveEmail"
+            bindinput="onInput"
+          />
+        </block>
+        <block wx:else>
+          <text class="form-value {{formData.receiveEmail ? '' : 'placeholder'}}">{{formData.receiveEmail || '未填写'}}</text>
+        </block>
+      </view>
+    </block>
+  </view>
+
+  <!-- 转账信息（仅管理员可见） -->
+  <view wx:if="{{isAdmin}}" class="detail-card">
+    <view class="card-header">
+      <text class="card-title">转账信息</text>
+    </view>
+    <view class="form-row">
+      <text class="form-label">户名</text>
+      <block wx:if="{{isEditing}}">
+        <input class="form-input" type="text" placeholder="收款人姓名" value="{{formData.bankAccountName}}" data-field="bankAccountName" bindinput="onInput" />
+      </block>
+      <block wx:else>
+        <text class="form-value {{formData.bankAccountName ? '' : 'placeholder'}}">{{formData.bankAccountName || '未填写'}}</text>
+      </block>
+    </view>
+    <view class="form-row">
+      <text class="form-label">卡号</text>
+      <block wx:if="{{isEditing}}">
+        <input class="form-input" type="number" placeholder="银行卡号" value="{{formData.bankCardNumber}}" data-field="bankCardNumber" bindinput="onInput" />
+      </block>
+      <block wx:else>
+        <text class="form-value {{formData.bankCardNumber ? '' : 'placeholder'}}">{{formData.bankCardNumber || '未填写'}}</text>
+      </block>
+    </view>
+    <view class="form-row last">
+      <text class="form-label">开户行</text>
+      <block wx:if="{{isEditing}}">
+        <input class="form-input" type="text" placeholder="开户行名称" value="{{formData.bankName}}" data-field="bankName" bindinput="onInput" />
+      </block>
+      <block wx:else>
+        <text class="form-value {{formData.bankName ? '' : 'placeholder'}}">{{formData.bankName || '未填写'}}</text>
+      </block>
+    </view>
+  </view>
+
+  <!-- 温馨提示 -->
+  <view class="tips">
+    <text class="tips-title">温馨提示</text>
+    <view class="tips-list">
+      <text class="tips-item">• 请确保车牌号填写准确，否则无法正常使用停车服务</text>
+      <text class="tips-item">• 个人信息仅用于提供服务，我们会严格保密</text>
+    </view>
+  </view>
+
+  <!-- 编辑/保存按钮 -->
+  <view class="bottom-actions">
+    <view class="bottom-btn {{isEditing ? 'save-btn' : 'edit-btn'}}" bindtap="onSave">
+      <text>{{isEditing ? '保存资料' : '编辑资料'}}</text>
+    </view>
+  </view>
+</view>

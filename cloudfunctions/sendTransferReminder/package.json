@@ -1,0 +1,8 @@
+{
+  "name": "sendTransferReminder",
+  "version": "1.0.0",
+  "description": "发送转账提醒订阅消息",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

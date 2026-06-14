@@ -1,0 +1,575 @@
+<view class="page">
+  <!-- loading -->
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:else>
+  <!-- 头部导航 -->
+  <view class="header">
+    <view class="header-left">
+      <view class="back-btn" bindtap="onBack">
+        <text class="back-icon">‹</text>
+      </view>
+      <text class="header-title">{{isEditing ? '编辑' : '发布'}}</text>
+    </view>
+    <view class="publish-btn" bindtap="onPublish">
+      <text>{{isEditing ? '保存' : '发布'}}</text>
+    </view>
+  </view>
+
+  <!-- 类型选择标签 -->
+  <view class="type-tabs" wx:if="{{!isEditing}}">
+    <scroll-view scroll-x class="tabs-scroll">
+      <view class="tabs">
+        <view 
+          class="tab {{publishType === 'group' ? 'active' : ''}}"
+          bindtap="onTypeChange"
+          data-type="group"
+        >
+          拼团活动
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+  
+  <!-- 编辑模式下显示当前类型 -->
+  <view wx:if="{{isEditing}}" class="type-tabs">
+    <view class="current-type">
+      <text class="current-type-text">拼团活动</text>
+    </view>
+  </view>
+
+  <view class="content">
+    <!-- 拼团活动表单 -->
+    <block wx:if="{{publishType === 'group'}}">
+      <!-- 活动标题 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>活动标题</text>
+        <input 
+          class="form-input" 
+          placeholder="请输入活动标题"
+          value="{{groupForm.title}}"
+          data-field="title"
+          data-type="group"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 活动地点 - 地图选点 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>活动地点</text>
+        <view class="location-picker" bindtap="onChooseLocation">
+          <image class="location-icon" src="/assets/icons/location.svg" mode="aspectFit" />
+          <view wx:if="{{groupForm.location}}" class="location-info">
+            <text class="location-name">{{groupForm.locationName || groupForm.location}}</text>
+            <text class="location-address">{{groupForm.locationAddress}}</text>
+          </view>
+          <text wx:else class="location-placeholder">点击选择停车场位置（自动获取省市区）</text>
+        </view>
+        <view wx:if="{{groupForm.location}}" class="location-actions">
+          <view class="location-action-btn" bindtap="onChooseLocation">重新选点</view>
+        </view>
+      </view>
+
+      <!-- 拼团设置 -->
+      <view class="form-card">
+        <text class="form-title">拼团设置</text>
+        <view class="form-row" style="margin-bottom: 16rpx;">
+          <view class="form-group">
+            <text class="form-label-small"><text class="required">*</text>目标月数</text>
+            <input 
+              class="form-input" 
+              type="number"
+              placeholder="40"
+              value="{{groupForm.targetMonths}}"
+              data-field="targetMonths"
+              data-type="group"
+              bindinput="onInput"
+            />
+          </view>
+        </view>
+        <view class="form-row">
+          <view class="form-group">
+            <text class="form-label-small"><text class="required">*</text>拼团价（元/月）</text>
+            <input 
+              class="form-input" 
+              type="number"
+              placeholder="299"
+              value="{{groupForm.groupPrice}}"
+              data-field="groupPrice"
+              data-type="group"
+              bindinput="onInput"
+            />
+          </view>
+          <view class="form-group">
+            <text class="form-label-small"><text class="required">*</text>原价（元/月）</text>
+            <input 
+              class="form-input" 
+              type="number"
+              placeholder="399"
+              value="{{groupForm.originalPrice}}"
+              data-field="originalPrice"
+              data-type="group"
+              bindinput="onInput"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 活动有效期 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>活动有效期</text>
+        <view class="form-row">
+          <view class="form-group">
+            <text class="form-label-small">起始日期</text>
+            <picker mode="date" value="{{groupForm.validFrom}}" bindchange="onDateChange" data-field="validFrom" data-type="group">
+              <view class="form-input date-display">
+                <text wx:if="{{groupForm.validFrom}}">{{groupForm.validFrom}}</text>
+                <text wx:else class="placeholder">请选择</text>
+              </view>
+            </picker>
+          </view>
+          <view class="form-group">
+            <text class="form-label-small">截止日期</text>
+            <picker mode="date" value="{{groupForm.validUntil}}" start="{{groupForm.validFrom || '2025-01-01'}}" bindchange="onDateChange" data-field="validUntil" data-type="group">
+              <view class="form-input date-display">
+                <text wx:if="{{groupForm.validUntil}}">{{groupForm.validUntil}}</text>
+                <text wx:else class="placeholder">请选择</text>
+              </view>
+            </picker>
+          </view>
+        </view>
+      </view>
+
+      <!-- 活动描述 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>活动描述</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="详细介绍活动内容、优惠详情等"
+          value="{{groupForm.description}}"
+          data-field="description"
+          data-type="group"
+          bindinput="onInput"
+          maxlength="999"
+          auto-height
+          key="{{formKey}}"
+        />
+        <view class="char-count">
+          <text class="{{groupForm.description.length >= 999 ? 'count-warn' : 'count-ok'}}">{{groupForm.description.length}}/999</text>
+        </view>
+      </view>
+
+      <!-- 温馨提示 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>温馨提示</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="每行一条提示"
+          value="{{groupForm.tips}}"
+          data-field="tips"
+          data-type="group"
+          bindinput="onInput"
+          maxlength="999"
+          auto-height
+          key="{{formKey}}"
+        />
+        <view class="char-count">
+          <text class="{{groupForm.tips.length >= 999 ? 'count-warn' : 'count-ok'}}">{{groupForm.tips.length}}/999</text>
+        </view>
+      </view>
+
+      <!-- 转账信息 -->
+      <view class="form-card">
+        <view class="section-title-row">
+          <text class="form-title">转账信息</text>
+          <view class="section-actions">
+            <view class="fill-preset-btn" bindtap="onFillBankFromPreset">一键填写</view>
+            <view class="save-preset-btn" bindtap="onSaveBankToPreset">保存预设</view>
+          </view>
+        </view>
+        <view class="form-row">
+          <view class="form-group" style="width:100%;">
+            <text class="form-label-small"><text class="required">*</text>户名</text>
+            <input class="form-input" placeholder="收款人姓名" value="{{groupForm.bankAccountName}}" data-field="bankAccountName" data-type="group" bindinput="onInput" />
+          </view>
+        </view>
+        <view class="form-row" style="margin-top:16rpx;">
+          <view class="form-group" style="width:100%;">
+            <text class="form-label-small"><text class="required">*</text>卡号</text>
+            <input class="form-input" placeholder="银行卡号" value="{{groupForm.bankCardNumber}}" data-field="bankCardNumber" data-type="group" bindinput="onInput" />
+          </view>
+        </view>
+        <view class="form-row" style="margin-top:16rpx;">
+          <view class="form-group" style="width:100%;">
+            <text class="form-label-small"><text class="required">*</text>开户行</text>
+            <input class="form-input" placeholder="例如：招商银行深圳分行" value="{{groupForm.bankName}}" data-field="bankName" data-type="group" bindinput="onInput" />
+          </view>
+        </view>
+      </view>
+
+      <!-- 活动状态 -->
+      <view class="form-card switch-card">
+        <view class="switch-left">
+          <text class="switch-title">活动状态</text>
+          <text class="switch-desc">{{groupForm.isClosed ? '活动已截止，用户无法报名' : '活动进行中，用户可以报名'}}</text>
+        </view>
+        <view 
+          class="switch-btn {{groupForm.isClosed ? 'off' : 'on'}}"
+          bindtap="onToggle"
+          data-field="isClosed"
+        >
+          <view class="switch-handle"></view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 月卡转让表单 -->
+    <block wx:if="{{publishType === 'transfer'}}">
+      <!-- 转让标题 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>转让标题</text>
+        <input 
+          class="form-input" 
+          placeholder="例如：KK ONE停车月卡转让"
+          maxlength="18"
+          value="{{transferForm.title}}"
+          data-field="title"
+          data-type="transfer"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 价格 -->
+      <view class="form-card">
+        <view class="form-row">
+          <view class="form-group">
+            <text class="form-label-small"><text class="required">*</text>转让价格（元）</text>
+            <input 
+              class="form-input" 
+              type="number"
+              placeholder="150"
+              value="{{transferForm.price}}"
+              data-field="price"
+              data-type="transfer"
+              bindinput="onInput"
+            />
+          </view>
+          <view class="form-group">
+            <text class="form-label-small">原价（元）</text>
+            <input 
+              class="form-input" 
+              type="number"
+              placeholder="299"
+              value="{{transferForm.originalPrice}}"
+              data-field="originalPrice"
+              data-type="transfer"
+              bindinput="onInput"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 停车场位置 - 地图选点 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>停车场位置</text>
+        <view class="location-picker" bindtap="onChooseLocation">
+          <image class="location-icon" src="/assets/icons/location.svg" mode="aspectFit" />
+          <view wx:if="{{transferForm.parkingLot}}" class="location-info">
+            <text class="location-name">{{transferForm.parkingName || transferForm.parkingLot}}</text>
+            <text class="location-address">{{transferForm.parkingAddress}}</text>
+          </view>
+          <text wx:else class="location-placeholder">点击选择停车场位置（自动获取省市区）</text>
+        </view>
+        <view wx:if="{{transferForm.parkingLot}}" class="location-actions">
+          <view class="location-action-btn" bindtap="onChooseLocation">重新选点</view>
+        </view>
+      </view>
+
+      <!-- 有效期 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>有效期</text>
+        <view class="form-row">
+          <view class="form-group">
+            <text class="form-label-small">起始日期</text>
+            <picker 
+              mode="date" 
+              value="{{transferForm.validFrom}}" 
+              bindchange="onDateChange"
+              data-field="validFrom"
+            >
+              <view class="form-input date-display">
+                <text wx:if="{{transferForm.validFrom}}">{{transferForm.validFrom}}</text>
+                <text wx:else class="placeholder">请选择</text>
+              </view>
+            </picker>
+          </view>
+          <view class="form-group">
+            <text class="form-label-small">截止日期</text>
+            <picker 
+              mode="date" 
+              value="{{transferForm.validUntil}}" 
+              start="{{transferForm.validFrom || '2025-01-01'}}"
+              bindchange="onDateChange"
+              data-field="validUntil"
+            >
+              <view class="form-input date-display">
+                <text wx:if="{{transferForm.validUntil}}">{{transferForm.validUntil}}</text>
+                <text wx:else class="placeholder">请选择</text>
+              </view>
+            </picker>
+          </view>
+        </view>
+      </view>
+
+      <!-- 详细描述 -->
+      <view class="form-card">
+        <text class="form-label"><text class="required">*</text>详细描述</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="至少填写12个字，描述月卡状态、转让原因等"
+          maxlength="512"
+          value="{{transferForm.description}}"
+          data-field="description"
+          data-type="transfer"
+          bindinput="onInput"
+          auto-height
+          key="{{formKey}}"
+        />
+        <view class="char-count">
+          <text class="{{transferForm.description.length >= 12 ? 'count-ok' : 'count-warn'}}">{{transferForm.description.length}}/512</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 闲置二手表单 -->
+    <block wx:if="{{publishType === 'secondhand'}}">
+      <!-- 物品名称 -->
+      <view class="form-card">
+        <text class="form-label">物品名称</text>
+        <input 
+          class="form-input" 
+          placeholder="例如：九成新跑步机转让"
+          value="{{secondhandForm.title}}"
+          data-field="title"
+          data-type="secondhand"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 价格和位置 -->
+      <view class="form-card">
+        <view class="form-row">
+          <view class="form-group">
+            <text class="form-label-small">出售价格（元）</text>
+            <input 
+              class="form-input" 
+              type="number"
+              placeholder="800"
+              value="{{secondhandForm.price}}"
+              data-field="price"
+              data-type="secondhand"
+              bindinput="onInput"
+            />
+          </view>
+          <view class="form-group">
+            <text class="form-label-small">所在区域</text>
+            <input 
+              class="form-input" 
+              placeholder="南山区"
+              value="{{secondhandForm.location}}"
+              data-field="location"
+              data-type="secondhand"
+              bindinput="onInput"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 物品详情 -->
+      <view class="form-card">
+        <view class="form-row" style="margin-bottom: 16rpx;">
+          <view class="form-group">
+            <text class="form-label-small">品牌</text>
+            <input 
+              class="form-input" 
+              placeholder="乔山"
+              value="{{secondhandForm.brand}}"
+              data-field="brand"
+              data-type="secondhand"
+              bindinput="onInput"
+            />
+          </view>
+        </view>
+        <view class="form-row">
+          <view class="form-group">
+            <text class="form-label-small">成色</text>
+            <input 
+              class="form-input" 
+              placeholder="9成新"
+              value="{{secondhandForm.condition}}"
+              data-field="condition"
+              data-type="secondhand"
+              bindinput="onInput"
+            />
+          </view>
+          <view class="form-group">
+            <text class="form-label-small">购买时间</text>
+            <input 
+              class="form-input" 
+              type="month"
+              placeholder="2024-01"
+              value="{{secondhandForm.purchaseDate}}"
+              data-field="purchaseDate"
+              data-type="secondhand"
+              bindinput="onInput"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 详细描述 -->
+      <view class="form-card">
+        <text class="form-label">详细描述</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="详细介绍物品情况、使用时长、功能等"
+          value="{{secondhandForm.description}}"
+          data-field="description"
+          data-type="secondhand"
+          bindinput="onInput"
+          auto-height
+          key="{{formKey}}"
+        />
+      </view>
+    </block>
+
+    <!-- 招聘信息表单 -->
+    <block wx:if="{{publishType === 'job'}}">
+      <!-- 职位名称 -->
+      <view class="form-card">
+        <text class="form-label">职位名称</text>
+        <input 
+          class="form-input" 
+          placeholder="例如：招聘健身教练"
+          value="{{jobForm.title}}"
+          data-field="title"
+          data-type="job"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 薪资和类型 -->
+      <view class="form-card">
+        <view class="form-row">
+          <view class="form-group">
+            <text class="form-label-small">薪资待遇</text>
+            <input 
+              class="form-input" 
+              placeholder="8000-15000"
+              value="{{jobForm.salary}}"
+              data-field="salary"
+              data-type="job"
+              bindinput="onInput"
+            />
+          </view>
+          <view class="form-group">
+            <text class="form-label-small">工作类型</text>
+            <input 
+              class="form-input" 
+              placeholder="全职"
+              value="{{jobForm.jobType}}"
+              data-field="jobType"
+              data-type="job"
+              bindinput="onInput"
+            />
+          </view>
+        </view>
+      </view>
+
+      <!-- 工作地点 -->
+      <view class="form-card">
+        <text class="form-label">工作地点</text>
+        <input 
+          class="form-input" 
+          placeholder="南山区"
+          value="{{jobForm.location}}"
+          data-field="location"
+          data-type="job"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 岗位要求 -->
+      <view class="form-card">
+        <text class="form-label">岗位要求</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="描述岗位要求、技能、经验等"
+          value="{{jobForm.requirements}}"
+          data-field="requirements"
+          data-type="job"
+          bindinput="onInput"
+          auto-height
+          key="{{formKey}}"
+        />
+      </view>
+
+      <!-- 福利待遇 -->
+      <view class="form-card">
+        <text class="form-label">福利待遇</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="五险一金、带薪年假等"
+          value="{{jobForm.benefits}}"
+          data-field="benefits"
+          data-type="job"
+          bindinput="onInput"
+          auto-height
+          key="{{formKey}}"
+        />
+      </view>
+
+      <!-- 工作时间 -->
+      <view class="form-card">
+        <text class="form-label">工作时间</text>
+        <input 
+          class="form-input" 
+          placeholder="做六休一，9:00-21:00"
+          value="{{jobForm.workTime}}"
+          data-field="workTime"
+          data-type="job"
+          bindinput="onInput"
+        />
+      </view>
+
+      <!-- 详细描述 -->
+      <view class="form-card">
+        <text class="form-label">详细描述</text>
+        <textarea 
+          class="form-textarea" 
+          placeholder="详细介绍职位、公司、工作内容等"
+          value="{{jobForm.description}}"
+          data-field="description"
+          data-type="job"
+          bindinput="onInput"
+          auto-height
+          key="{{formKey}}"
+        />
+      </view>
+    </block>
+
+  </view>
+
+  <!-- 成功弹窗 -->
+  <view wx:if="{{showSuccessModal}}" class="modal-mask" catchtap="onCloseSuccess" catchtouchmove="stopPropagation">
+    <view class="modal-content success-modal" catchtap="stopPropagation">
+      <view class="success-icon"><text class="check-icon">✓</text></view>
+      <text class="success-title">{{isEditing ? '修改成功！' : '发布成功！'}}</text>
+      <text wx:if="{{!isEditing}}" class="success-desc">恭喜您成功发布活动信息，其他用户可以看到您的内容</text>
+      <view class="btn-know" bindtap="onCloseSuccess">我知道了</view>
+    </view>
+  </view>
+  </block>
+</view>

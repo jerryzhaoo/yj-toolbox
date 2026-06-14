@@ -1,0 +1,542 @@
+<view class="page">
+  <!-- loading -->
+  <block wx:if="{{loading}}">
+    <view class="loading-wrap">
+      <text class="loading-text">加载中...</text>
+    </view>
+  </block>
+
+  <block wx:else>
+  <view class="content">
+    <!-- 活动信息卡片 -->
+    <view class="card activity-card">
+      <view class="activity-header">
+        <text class="activity-title">{{activity.title}}</text>
+        <view class="status-badge {{isExpired ? 'status-expired' : 'status-active'}}">{{isExpired ? '已截止' : '进行中'}}</view>
+      </view>
+      
+      <view class="activity-meta">
+        <view class="meta-item">
+          <view class="meta-icon-wrap">
+            <image class="meta-svg-icon" src="/assets/icons/location.svg" mode="aspectFit" />
+          </view>
+          <text class="meta-text">{{location}}</text>
+        </view>
+      </view>
+
+      <!-- 价格 -->
+      <view class="price-box">
+        <view class="price-row">
+          <text class="price-label">拼团价</text>
+          <text class="price-value">¥{{monthlyPrice}}</text>
+          <text class="price-original">¥{{originalPrice}}</text>
+          <view class="price-save">
+            <text>省¥{{originalPrice - monthlyPrice}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 有效期 -->
+      <view class="validity-row" wx:if="{{activity.validFrom || activity.validUntil}}">
+        <view class="meta-icon-wrap">
+          <image class="meta-svg-icon" src="/assets/icons/calendar.svg" mode="aspectFit" />
+        </view>
+        <text class="validity-text">{{activity.validFrom}} 至 {{activity.validUntil}}</text>
+      </view>
+    </view>
+
+    <!-- 活动描述 -->
+    <view class="card desc-card" wx:if="{{activity.description}}">
+      <text class="desc-title">活动描述</text>
+      <text class="desc-text">{{activity.description}}</text>
+    </view>
+
+    <!-- 拼团进度 -->
+    <view class="card progress-card">
+      <view class="progress-header">
+        <text class="progress-title">拼团进度</text>
+        <text class="progress-info">已拼 <text class="highlight">{{currentMonths}}</text> 月 / 目标 {{targetMonths}} 月</text>
+      </view>
+
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{progress > 100 ? 100 : progress}}%;">
+          <text class="progress-text">{{progress}}%</text>
+        </view>
+      </view>
+
+      <text class="progress-tip" wx:if="{{currentMonths >= targetMonths && targetMonths > 0}}">🎉 已达成目标，拼团成功！</text>
+      <text class="progress-tip" wx:elif="{{currentMonths > 0 && targetMonths > 0}}">还差 <text class="orange">{{targetMonths - currentMonths}}</text> 月即可达成优惠</text>
+      <text class="progress-tip" wx:else>目标 {{targetMonths}} 个月，快来加入吧</text>
+    </view>
+
+    <!-- 参与人员列表 -->
+    <view class="card participants-card">
+      <view class="participants-header">
+        <view class="participants-title-wrap">
+          <text class="participants-title">参与人员 ({{participants.length}}人)</text>
+          <view class="participants-stat-row">
+            <text class="participants-stat">{{transferredCount}}人已转账 · {{untransferredCount}}人未转账</text>
+            <view wx:if="{{isAdmin && untransferredCount > 0}}" class="remind-btn" bindtap="onRemindTransfer">
+              <text class="remind-text">提醒转账</text>
+            </view>
+          </view>
+        </view>
+        <view class="participants-actions">
+          <view class="refresh-btn" bindtap="onRefreshParticipants">
+            <text class="refresh-text">⟳ 刷新</text>
+          </view>
+          <view wx:if="{{isAdmin}}" class="export-btn" bindtap="onShowExportConfirm">
+            <view class="export-icon-wrap">
+              <image class="export-svg-icon" src="/assets/icons/download.svg" mode="aspectFit" />
+            </view>
+            <text class="export-text">导出Excel</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="table-wrapper">
+        <view class="table">
+          <view class="table-header">
+            <text class="th" style="width: 14%;">姓名</text>
+            <text class="th" style="width: 18%;">车牌号</text>
+            <text class="th" style="width: 10%;">月数</text>
+            <text class="th" style="width: 14%;">应付</text>
+            <text class="th" style="width: 12%;">转账</text>
+            <text class="th" style="width: 16%;">凭证</text>
+            <text class="th" style="width: 16%;" wx:if="{{isAdmin}}">操作</text>
+          </view>
+          <view class="table-body">
+            <view wx:for="{{participants}}" wx:key="id" class="table-row">
+              <text class="td" style="width: 14%;">{{item._displayName || item.name}}</text>
+              <text class="td mono" style="width: 18%;">{{item._displayCarNumber || item.carNumber}}</text>
+              <text class="td purple" style="width: 10%;">{{item.months}}</text>
+              <text class="td" style="width: 14%;">¥{{item.months * monthlyPrice}}</text>
+              <text class="td" style="width: 12%; color: {{item.hasTransfer ? '#22C55E' : '#9CA3AF'}};">{{item.hasTransfer ? '是' : '否'}}</text>
+              <view class="td" style="width: 16%;" wx:if="{{item.voucherUrl}}">
+                <image class="voucher-thumb" src="{{item._voucherTempUrl || item.voucherUrl}}" mode="aspectFill" data-url="{{item._voucherTempUrl || item.voucherUrl}}" catchtap="onPreviewVoucher" />
+              </view>
+              <text class="td" style="width: 16%; color: #9CA3AF;" wx:else>无</text>
+              <view class="td-ops" style="width: 16%;" wx:if="{{isAdmin}}">
+                <text class="op-link" data-item="{{item}}" catchtap="onViewParticipant">查看</text>
+                <text class="op-link op-del" data-id="{{item._id}}" catchtap="onDeleteParticipant">删除</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="trust-tip">
+        <text class="trust-star">*</text>
+        <text>请如实填写，如核实后发现凭证虚假实际未转账，则永久拉入拼团黑名单！！！</text>
+      </view>
+    </view>
+
+    <!-- 转账信息卡片（仅已报名或管理员可见） -->
+    <view wx:if="{{activity.bankAccountName || activity.bankCardNumber || activity.bankName}}" class="bank-info-card">
+      <view class="bank-info-header">
+        <text class="bank-info-icon">💳</text>
+        <text class="bank-info-title">转账信息</text>
+      </view>
+      <view wx:if="{{hasSignedUp || isAdmin}}" class="bank-info-body">
+        <view class="bank-field">
+          <text class="bank-label">户名</text>
+          <text class="bank-value" user-select>{{displayBankAccountName || '暂无'}}</text>
+          <text class="bank-copy" catchtap="onCopyBankText" data-field="bankAccountName">复制</text>
+        </view>
+        <view class="bank-field">
+          <text class="bank-label">卡号</text>
+          <text class="bank-value" user-select>{{displayBankCardNumber || '暂无'}}</text>
+          <text class="bank-copy" catchtap="onCopyBankText" data-field="bankCardNumber">复制</text>
+        </view>
+        <view class="bank-field">
+          <text class="bank-label">开户行</text>
+          <text class="bank-value" user-select>{{displayBankName || '暂无'}}</text>
+          <text class="bank-copy" catchtap="onCopyBankText" data-field="bankName">复制</text>
+        </view>
+      </view>
+      <block wx:else>
+        <view class="bank-info-body">
+          <text class="bank-no-auth">报名后可查看转账信息</text>
+        </view>
+      </block>
+    </view>
+
+    <!-- 温馨提示 -->
+    <view class="tips-box {{isExpired ? 'tips-gray' : 'tips-blue'}}">
+      <text class="tips-title">{{isExpired ? '活动已结束' : '温馨提示'}}</text>
+      <block wx:if="{{isExpired}}">
+        <text class="tips-item">• 该拼团活动已于 {{closeTimeText}} 截止</text>
+        <text class="tips-item">• 感谢您的关注，敬请期待下次活动</text>
+      </block>
+      <block wx:else>
+        <block wx:if="{{tipsList.length > 0}}">
+          <text class="tips-item" wx:for="{{tipsList}}" wx:key="index">• {{item}}</text>
+        </block>
+        <block wx:else>
+          <text class="tips-item" wx:if="{{targetMonths > 0}}">• 拼团满{{targetMonths}}个月即可享受优惠价格</text>
+          <text class="tips-item">• 拼团成功后联系您办理</text>
+          <text class="tips-item">• 车牌信息需准确，否则无法正常使用</text>
+          <text class="tips-item">• 拼团失败全额退款至原支付账户</text>
+        </block>
+      </block>
+    </view>
+
+  </view>
+  <!-- 悬浮底部按钮 -->
+  <view class="bottom-bar">
+    <view wx:if="{{isAuthor || isAdmin}}" class="btn-group">
+      <view class="btn-edit" bindtap="onEdit">编辑活动</view>
+      <view class="btn-join {{isExpired ? 'btn-disabled' : ''}}" bindtap="onShowSignUp">
+        {{isExpired ? '已截止' : (hasSignedUp ? '编辑报名' : '我也报名')}}
+      </view>
+      <view wx:if="{{hasSignedUp && !isExpired}}" class="btn-cancel-sign" bindtap="onCancelSignUp">取消报名</view>
+    </view>
+    <view wx:else class="btn-row-2col">
+      <view class="btn-sign-blue {{isExpired ? 'btn-disabled' : ''}}" bindtap="onShowSignUp">
+        {{isExpired ? '已截止' : (hasSignedUp ? '编辑报名' : '立即报名上车')}}
+      </view>
+      <view wx:if="{{hasSignedUp && !isExpired}}" class="btn-sign-orange" bindtap="onCancelSignUp">取消报名</view>
+    </view>
+  </view>
+
+  <!-- 报名弹窗 -->
+  <view wx:if="{{showSignUpModal}}" class="modal-mask" catchtap="onCloseSignUp" catchtouchmove="stopPropagation">
+    <view class="modal-content modal-scroll" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">{{mySignUpId ? '编辑报名信息' : '填写报名信息'}}</text>
+        <view class="modal-close" bindtap="onCloseSignUp"><text>✕</text></view>
+      </view>
+      <view class="preset-actions">
+        <view class="preset-btn" bindtap="onFillInvoiceFromPreset">一键填写</view>
+        <view class="preset-btn preset-save" bindtap="onSaveInvoiceToPreset">保存到预设信息</view>
+      </view>
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label"><text class="required-star">*</text>姓名</text>
+          <view class="input-wrap">
+            <input name="name" placeholder="请输入您的姓名" class="form-input" value="{{signForm.name}}" data-field="name" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+            <view wx:if="{{focusedField === 'name' && signForm.name}}" class="clear-btn" catchtap="onClearSignInput" data-field="name">✕</view>
+          </view>
+        </view>
+        <view class="form-group">
+          <text class="form-label"><text class="required-star">*</text>手机号</text>
+          <view class="input-wrap">
+            <input name="phone" type="number" placeholder="请输入您的手机号" class="form-input" value="{{signForm.phone}}" data-field="phone" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+            <view wx:if="{{focusedField === 'phone' && signForm.phone}}" class="clear-btn" catchtap="onClearSignInput" data-field="phone">✕</view>
+          </view>
+        </view>
+        <view class="form-row-2col">
+          <view class="form-group">
+            <text class="form-label"><text class="required-star">*</text>车牌号</text>
+            <view class="input-wrap">
+              <input name="carNumber" placeholder="如：粤B12345" class="form-input upper" value="{{signForm.carNumber}}" data-field="carNumber" maxlength="8" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <view wx:if="{{focusedField === 'carNumber' && signForm.carNumber}}" class="clear-btn" catchtap="onClearSignInput" data-field="carNumber">✕</view>
+            </view>
+          </view>
+          <view class="form-group">
+            <text class="form-label"><text class="required-star">*</text>购买月数</text>
+            <view class="input-wrap">
+              <input name="months" type="number" placeholder="月数" class="form-input" value="{{signForm.months}}" data-field="months" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <view wx:if="{{focusedField === 'months' && signForm.months}}" class="clear-btn" catchtap="onClearSignInput" data-field="months">✕</view>
+            </view>
+          </view>
+        </view>
+        <!-- 生效日期 -->
+        <view class="form-group">
+          <text class="form-label">生效日期</text>
+          <view class="effect-date-row">
+            <view class="date-radio {{signForm.effectDate === '' ? 'date-active' : ''}}" bindtap="onSetEffectDefer">
+              <text>顺延</text>
+            </view>
+            <view class="date-radio {{signForm.effectDate !== '' ? 'date-active' : ''}}">
+              <picker mode="date" value="{{signForm.effectDate}}" bindchange="onEffectDateChange">
+                <view class="date-picker-trigger">
+                  <text wx:if="{{signForm.effectDate}}">{{signForm.effectDate}}</text>
+                  <text wx:else>指定日期</text>
+                  <text class="date-arrow">▸</text>
+                </view>
+              </picker>
+            </view>
+          </view>
+        </view>
+        <view class="form-group switch-group">
+          <text class="form-label">是否转账</text>
+          <view class="switch-wrap">
+            <text class="switch-label {{signForm.hasTransfer ? '' : 'active'}}">否</text>
+            <switch class="transfer-switch" checked="{{signForm.hasTransfer}}" data-field="hasTransfer" bindchange="onSignInput" color="#3B82F6" />
+            <text class="switch-label {{signForm.hasTransfer ? 'active' : ''}}">是</text>
+          </view>
+        </view>
+        <view class="form-group" wx:if="{{signForm.hasTransfer}}">
+          <text class="form-label"><text class="required-star">*</text>上传转账凭证</text>
+          <view class="upload-box" bindtap="onUploadVoucher" wx:if="{{!signForm.voucherUrl}}">
+            <view class="upload-icon-wrap">
+              <image class="upload-svg" src="/assets/icons/upload.svg" mode="aspectFit" />
+            </view>
+            <text class="upload-text">点击上传</text>
+          </view>
+          <view class="voucher-preview" wx:else>
+            <image class="voucher-img" src="{{signForm.voucherUrl}}" mode="aspectFill" />
+            <view class="voucher-remove" catchtap="onRemoveVoucher">
+              <text class="remove-icon">✕</text>
+            </view>
+          </view>
+        </view>
+        <view class="trust-tip" style="margin:0 0 10rpx;">
+          <text class="trust-star">*</text>
+          <text>请如实填写，如核实后发现凭证虚假实际未转账，则永久拉入拼团黑名单！！！</text>
+        </view>
+        <!-- 发票信息 -->
+        <view class="form-group invoice-section">
+          <view class="invoice-header-row">
+            <text class="form-label" style="margin-bottom:0;">发票信息</text>
+            <view class="invoice-toggle {{signForm.needInvoice ? 'on' : 'off'}}" bindtap="onToggleInvoice">
+              <text>{{signForm.needInvoice ? '需要发票 ▾' : '不需要 ▸'}}</text>
+            </view>
+          </view>
+          <block wx:if="{{signForm.needInvoice}}">
+            <view class="form-group" style="padding:6rpx 0;">
+              <text class="form-label"><text class="required-star">*</text>公司名称</text>
+              <view class="input-wrap">
+                <input name="companyName" placeholder="请输入公司名称" class="form-input" value="{{signForm.companyName}}" data-field="companyName" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+                <view wx:if="{{focusedField === 'companyName' && signForm.companyName}}" class="clear-btn" catchtap="onClearSignInput" data-field="companyName">✕</view>
+              </view>
+            </view>
+            <view class="form-row-2col" style="padding:6rpx 0;">
+              <view class="form-group" style="padding:0;">
+                <text class="form-label">发票类型</text>
+                <view class="inv-type-select">
+                  <view class="inv-type-btn {{signForm.invoiceType === '普票' ? 'active' : ''}}" bindtap="onSetInvoiceType" data-type="普票">普票</view>
+                  <view class="inv-type-btn {{signForm.invoiceType === '专票' ? 'active' : ''}}" bindtap="onSetInvoiceType" data-type="专票">专票</view>
+                </view>
+              </view>
+              <view class="form-group" style="padding:0;">
+                <text class="form-label"><text class="required-star">*</text>税号</text>
+                <view class="input-wrap">
+                  <input name="taxNumber" placeholder="税号" class="form-input" value="{{signForm.taxNumber}}" data-field="taxNumber" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+                  <view wx:if="{{focusedField === 'taxNumber' && signForm.taxNumber}}" class="clear-btn" catchtap="onClearSignInput" data-field="taxNumber">✕</view>
+                </view>
+              </view>
+            </view>
+            <view class="form-group" style="padding:6rpx 0;">
+              <text class="form-label"><text class="required-star">*</text>接收邮箱</text>
+              <view class="input-wrap">
+                <input name="email" type="text" placeholder="请输入接收邮箱" class="form-input" value="{{signForm.email}}" data-field="email" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+                <view wx:if="{{focusedField === 'email' && signForm.email}}" class="clear-btn" catchtap="onClearSignInput" data-field="email">✕</view>
+              </view>
+            </view>
+          </block>
+        </view>
+        <view class="modal-btns">
+          <button type="button" class="btn-cancel" bindtap="onCloseSignUp">取消</button>
+          <button type="button" class="btn-submit" bindtap="onSubmitSignUp">确认提交</button>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- 成功弹窗 -->
+  <view wx:if="{{showSuccessModal}}" class="modal-mask success-mask" catchtap="onCloseSuccess" catchtouchmove="stopPropagation">
+    <view class="modal-content success-modal" catchtap="stopPropagation">
+      <view class="success-icon"><text class="check-icon">✓</text></view>
+      <text class="success-title">报名成功！</text>
+      <text class="success-desc">拼团成功后需要转账，开启提醒避免错过</text>
+      <view class="btn-know btn-subscribe" bindtap="onSubscribeTransferRemind">开启转账提醒</view>
+      <view class="btn-skip" bindtap="onCloseSuccess">稍后再说</view>
+    </view>
+  </view>
+
+  <!-- 导出确认弹窗 -->
+  <view wx:if="{{showExportConfirm}}" class="modal-mask" catchtap="onCloseExportConfirm" catchtouchmove="stopPropagation">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">确认导出表格</text>
+        <view class="modal-close" bindtap="onCloseExportConfirm"><text>✕</text></view>
+      </view>
+      <view class="export-info">
+        <text>即将导出 <text class="blue">{{exportOnlyTransferred ? transferredCount : participants.length}}</text> 位参与人员的信息至Excel表格</text>
+      </view>
+      <view class="export-filter">
+        <view class="export-checkbox {{exportOnlyTransferred ? 'checked' : ''}}" bindtap="onToggleExportFilter">
+          <view class="checkbox-box">{{exportOnlyTransferred ? '✓' : ''}}</view>
+          <text class="checkbox-label">仅导出已转账用户</text>
+        </view>
+      </view>
+      <view class="export-warning">
+        <text>注意：导出的数据包含姓名、车牌号、月数、支付方式等个人信息，请妥善保管</text>
+      </view>
+      <view class="modal-btns">
+        <button type="button" class="btn-cancel" bindtap="onCloseExportConfirm">取消</button>
+        <button type="button" class="btn-export" bindtap="onConfirmExport">确认导出</button>
+      </view>
+    </view>
+  </view>
+  <!-- 导出结果弹窗 -->
+  <view wx:if="{{showExportResult}}" class="modal-mask" catchtap="onCloseExportResult" catchtouchmove="stopPropagation">
+    <view class="modal-content result-modal {{exportResultSuccess ? 'result-success' : 'result-fail'}}" catchtap="stopPropagation">
+      <view class="result-icon">
+        <text class="result-icon-text {{exportResultSuccess ? 'icon-success' : 'icon-fail'}}">{{exportResultSuccess ? '✓' : '✕'}}</text>
+      </view>
+      <text class="result-title">{{exportResultSuccess ? '导出成功！' : '导出失败'}}</text>
+      <text class="result-desc">{{exportResultSuccess ? '参与人员信息已导出为CSV文件，点击下方按钮发送到微信即可用Excel打开' : (exportErrorMsg || '导出过程中出现错误，请稍后重试')}}</text>
+      <view wx:if="{{exportResultSuccess}}" class="result-tip">
+        <text>发送到「文件传输助手」后用Excel/WPS打开即可</text>
+      </view>
+      <view wx:if="{{!exportResultSuccess}}" class="result-error-tip">
+        <text>可能原因：网络连接异常、数据格式错误</text>
+      </view>
+      <view wx:if="{{exportResultSuccess}}" class="btn-know btn-success" bindtap="onOpenAndClose">分享文件</view>
+      <view wx:if="{{!exportResultSuccess}}" class="btn-know btn-fail" bindtap="onCloseExportResult">重试</view>
+    </view>
+  </view>
+
+  <!-- 管理员查看/编辑弹窗 -->
+  <view wx:if="{{showViewModal}}" class="modal-mask" catchtap="onCloseViewModal" catchtouchmove="stopPropagation">
+    <view class="modal-content modal-scroll" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">{{viewReadonly ? '查看报名信息' : '编辑报名信息'}}</text>
+        <view class="modal-header-right">
+          <view wx:if="{{viewReadonly}}" class="modal-edit-btn" catchtap="onToggleEdit">编辑</view>
+          <view class="modal-close" catchtap="onCloseViewModal"><text>✕</text></view>
+        </view>
+      </view>
+      <view class="modal-body">
+          <view class="form-group">
+          <text class="form-label"><text class="required-star">*</text>姓名</text>
+          <view class="input-wrap">
+            <input name="name" placeholder="请输入姓名" class="form-input" value="{{viewSignForm.name}}" data-field="name" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+            <view wx:if="{{focusedField === 'name' && !viewReadonly && viewSignForm.name}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="name">✕</view>
+          </view>
+        </view>
+        <view class="form-group">
+          <text class="form-label"><text class="required-star">*</text>手机号</text>
+          <view class="input-wrap">
+            <input name="phone" type="number" placeholder="请输入手机号" class="form-input" value="{{viewSignForm.phone}}" data-field="phone" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+            <view wx:if="{{focusedField === 'phone' && !viewReadonly && viewSignForm.phone}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="phone">✕</view>
+          </view>
+        </view>
+        <view class="form-row-2col">
+          <view class="form-group">
+            <text class="form-label"><text class="required-star">*</text>车牌号</text>
+            <view class="input-wrap">
+              <input name="carNumber" placeholder="如：粤B12345" class="form-input upper" value="{{viewSignForm.carNumber}}" data-field="carNumber" maxlength="8" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <view wx:if="{{focusedField === 'carNumber' && !viewReadonly && viewSignForm.carNumber}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="carNumber">✕</view>
+            </view>
+          </view>
+          <view class="form-group">
+            <text class="form-label"><text class="required-star">*</text>购买月数</text>
+            <view class="input-wrap">
+              <input name="months" type="number" placeholder="月数" class="form-input" value="{{viewSignForm.months}}" data-field="months" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <view wx:if="{{focusedField === 'months' && !viewReadonly && viewSignForm.months}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="months">✕</view>
+            </view>
+          </view>
+        </view>
+        <!-- 生效日期 -->
+        <view class="form-group">
+          <text class="form-label">生效日期</text>
+          <block wx:if="{{!viewReadonly}}">
+            <view class="effect-date-row">
+              <view class="date-radio {{viewSignForm.effectDate === '' ? 'date-active' : ''}}" bindtap="onViewSetEffectDefer">
+                <text>顺延</text>
+              </view>
+              <view class="date-radio {{viewSignForm.effectDate !== '' ? 'date-active' : ''}}">
+                <picker mode="date" value="{{viewSignForm.effectDate}}" bindchange="onViewEffectDateChange">
+                  <view class="date-picker-trigger">
+                    <text wx:if="{{viewSignForm.effectDate}}">{{viewSignForm.effectDate}}</text>
+                    <text wx:else>指定日期</text>
+                    <text class="date-arrow">▸</text>
+                  </view>
+                </picker>
+              </view>
+            </view>
+          </block>
+          <block wx:else>
+            <text class="form-static-text">{{viewSignForm.effectDate ? viewSignForm.effectDate : '顺延'}}</text>
+          </block>
+        </view>
+        <view class="form-group switch-group">
+          <text class="form-label">是否转账</text>
+          <view class="switch-wrap">
+            <text class="switch-label {{viewSignForm.hasTransfer ? '' : 'active'}}">否</text>
+            <switch class="transfer-switch" checked="{{viewSignForm.hasTransfer}}" data-field="hasTransfer" disabled="{{viewReadonly}}" bindchange="onViewSignInput" color="#3B82F6" />
+            <text class="switch-label {{viewSignForm.hasTransfer ? 'active' : ''}}">是</text>
+          </view>
+        </view>
+        <view class="form-group" wx:if="{{viewSignForm.hasTransfer}}">
+          <text class="form-label"><text class="required-star">*</text>上传转账凭证</text>
+          <view wx:if="{{!viewReadonly && !viewSignForm.voucherUrl}}" class="upload-box" catchtap="onViewUploadVoucher">
+            <view class="upload-icon-wrap">
+              <image class="upload-svg" src="/assets/icons/upload.svg" mode="aspectFit" />
+            </view>
+            <text class="upload-text">点击上传</text>
+          </view>
+          <view wx:else class="voucher-preview">
+            <image class="voucher-img" src="{{viewSignForm.voucherUrl}}" mode="aspectFill" data-url="{{viewSignForm.voucherUrl}}" catchtap="onPreviewVoucher" />
+            <view wx:if="{{!viewReadonly}}" class="voucher-remove" catchtap="onViewRemoveVoucher">
+              <text class="remove-icon">✕</text>
+            </view>
+          </view>
+        </view>
+        <view class="trust-tip" style="margin:0 0 6rpx;">
+          <text class="trust-star">*</text>
+          <text>请如实填写，如核实后发现凭证虚假实际未转账，则永久拉入拼团黑名单！！！</text>
+        </view>
+        <!-- 发票信息 -->
+        <view class="form-group invoice-section">
+          <view class="invoice-header-row">
+            <text class="form-label" style="margin-bottom:0;">发票信息</text>
+            <view class="invoice-toggle {{viewSignForm.needInvoice ? 'on' : 'off'}}" bindtap="{{viewReadonly ? '' : 'onViewToggleInvoice'}}">
+              <text>
+                <block wx:if="{{!viewReadonly}}">{{viewSignForm.needInvoice ? '需要发票 ▾' : '不需要 ▸'}}</block>
+                <block wx:else>{{viewSignForm.needInvoice ? '需要发票' : '不需要'}}</block>
+              </text>
+            </view>
+          </view>
+          <block wx:if="{{viewSignForm.needInvoice}}">
+            <view class="form-group" style="padding:6rpx 0;">
+              <text class="form-label"><text class="required-star">*</text>公司名称</text>
+              <view class="input-wrap">
+                <input name="companyName" placeholder="公司名称" class="form-input" value="{{viewSignForm.companyName}}" data-field="companyName" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+                <view wx:if="{{focusedField === 'companyName' && !viewReadonly && viewSignForm.companyName}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="companyName">✕</view>
+              </view>
+            </view>
+            <view class="form-row-2col" style="padding:6rpx 0;">
+              <view class="form-group" style="padding:0;">
+                <text class="form-label">发票类型</text>
+                <block wx:if="{{!viewReadonly}}">
+                  <view class="inv-type-select">
+                    <view class="inv-type-btn {{viewSignForm.invoiceType === '普票' ? 'active' : ''}}" bindtap="onViewSetInvoiceType" data-type="普票">普票</view>
+                    <view class="inv-type-btn {{viewSignForm.invoiceType === '专票' ? 'active' : ''}}" bindtap="onViewSetInvoiceType" data-type="专票">专票</view>
+                  </view>
+                </block>
+                <block wx:else>
+                  <text class="form-static-text small">{{viewSignForm.invoiceType}}</text>
+                </block>
+              </view>
+              <view class="form-group" style="padding:0;">
+                <text class="form-label"><text class="required-star">*</text>税号</text>
+                <view class="input-wrap">
+                  <input name="taxNumber" placeholder="税号" class="form-input" value="{{viewSignForm.taxNumber}}" data-field="taxNumber" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+                  <view wx:if="{{focusedField === 'taxNumber' && !viewReadonly && viewSignForm.taxNumber}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="taxNumber">✕</view>
+                </view>
+              </view>
+            </view>
+            <view class="form-group" style="padding:6rpx 0;">
+              <text class="form-label"><text class="required-star">*</text>接收邮箱</text>
+              <view class="input-wrap">
+                <input name="email" type="text" placeholder="请输入接收邮箱" class="form-input" value="{{viewSignForm.email}}" data-field="email" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+                <view wx:if="{{focusedField === 'email' && !viewReadonly && viewSignForm.email}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="email">✕</view>
+              </view>
+            </view>
+          </block>
+        </view>
+        <view class="modal-btns" wx:if="{{!viewReadonly}}">
+          <button type="button" class="btn-cancel" bindtap="onCloseViewModal">取消</button>
+          <button type="button" class="btn-submit" bindtap="onSubmitViewEdit">确认保存</button>
+        </view>
+      </view>
+    </view>
+  </view>
+  </block>
+
+  <!-- 隐藏 canvas，用于生成分享缩略图 -->
+  <canvas canvas-id="shareCardCanvas" style="width:500px;height:360px;position:fixed;left:-9999px;top:-9999px;"></canvas>
+</view>

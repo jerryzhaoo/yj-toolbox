@@ -1,0 +1,339 @@
+<view class="page">
+  <!-- 顶部用户信息 -->
+  <view class="user-header">
+    <view class="user-info">
+      <view class="avatar">
+        <image wx:if="{{userData.avatar}}" class="avatar-img" src="{{userData.avatar}}" mode="aspectFill" />
+        <image wx:else class="avatar-svg" src="/assets/icons/user.svg" mode="aspectFit" />
+      </view>
+      <view class="user-detail">
+        <text class="user-name">{{userData.name || '用户昵称'}}</text>
+        <text class="user-gender">{{userData.gender || '未设置'}}</text>
+      </view>
+      <view class="edit-btn" bindtap="onEditProfileDirect">
+        <text class="edit-icon">✎</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-container">
+    <view class="stats-grid">
+      <view class="stat-card" bindtap="onMyPosts">
+        <view class="stat-icon blue">
+          <image class="stat-svg" src="/assets/icons/document.svg" mode="aspectFit" />
+        </view>
+        <text class="stat-count">{{userData.myPostsCount}}</text>
+        <text class="stat-label">我发布的</text>
+      </view>
+      <view class="stat-card" bindtap="onMyJoined">
+        <view class="stat-icon orange">
+          <image class="stat-svg" src="/assets/icons/trophy.svg" mode="aspectFit" />
+        </view>
+        <text class="stat-count">{{userData.myJoinedCount}}</text>
+        <text class="stat-label">我参与的</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 菜单列表 -->
+  <view class="menu-container">
+    <view class="menu-list">
+      <view class="menu-item" bindtap="onEditProfile">
+        <view class="menu-left">
+          <view class="menu-icon blue-bg">
+            <image class="menu-svg" src="/assets/icons/user.svg" mode="aspectFit" />
+          </view>
+          <text class="menu-text">预设报名信息</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <!-- 使用帮助 -->
+      <view class="menu-item" bindtap="onHelp">
+        <view class="menu-left">
+          <view class="menu-icon green-bg">
+            <image class="menu-svg" src="/assets/icons/document.svg" mode="aspectFit" />
+          </view>
+          <text class="menu-text">使用帮助</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <!-- 社群信息 -->
+      <view class="menu-item" bindtap="onCommunity">
+        <view class="menu-left">
+          <view class="menu-icon light-green-bg">
+            <image class="menu-svg" src="/assets/icons/heart.svg" mode="aspectFit" />
+          </view>
+          <text class="menu-text">社群信息</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <!-- 活动口令激活入口（始终可见） -->
+      <view class="menu-item" bindtap="onShowCdkActivate">
+        <view class="menu-left">
+          <view class="menu-icon light-green-bg">
+            <image class="menu-svg" src="/assets/icons/message.svg" mode="aspectFit" />
+          </view>
+          <text class="menu-text">活动口令激活</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <!-- 管理员配置入口（仅超级管理员可见） -->
+      <view class="menu-item" bindtap="onManageAdmins" wx:if="{{adminChecked && isSuperAdmin}}">
+        <view class="menu-left">
+          <view class="menu-icon purple-bg">
+            <image class="menu-svg" src="/assets/icons/shield.svg" mode="aspectFit" />
+          </view>
+          <text class="menu-text">管理员配置</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 管理员配置弹窗 -->
+  <view class="modal-mask" wx:if="{{showAdminModal}}" bindtap="onCloseAdminModal"></view>
+  <view class="admin-modal" wx:if="{{showAdminModal}}">
+    <view class="admin-modal-header">
+      <text class="admin-modal-title">管理员配置</text>
+      <text class="admin-modal-close" bindtap="onCloseAdminModal">✕</text>
+    </view>
+
+    <view class="admin-list">
+      <view class="admin-item" wx:for="{{adminList}}" wx:key="_id">
+        <view class="admin-info" data-id="{{item._id}}" data-invite="{{item.inviteCode}}" bindtap="onShowExistingInviteCode">
+          <text class="admin-wechat">{{item.wechat || '未填写'}}</text>
+          <view class="admin-role {{item.role === 'super' ? 'role-super' : ''}} {{item.role === 'admin' && item.activated ? 'role-admin' : ''}} {{item.role === 'admin' && !item.activated ? 'role-pending' : ''}}">
+            {{item.role === 'super' ? '超级管理员' : ''}}
+            {{item.role === 'admin' && item.activated ? '已激活' : ''}}
+            {{item.role === 'admin' && !item.activated ? '待激活' : ''}}
+          </view>
+        </view>
+        <view 
+          class="admin-remove {{item.role === 'super' ? 'remove-disabled' : ''}}" 
+          bindtap="onRemoveAdmin" 
+          data-id="{{item._id}}" 
+          data-wechat="{{item.wechat}}"
+          data-role="{{item.role}}"
+        >
+          移除
+        </view>
+      </view>
+      <view class="admin-empty" wx:if="{{adminList.length === 0}}">
+        <text>暂无管理员</text>
+      </view>
+    </view>
+
+    <!-- 添加管理员 -->
+    <view class="add-admin-section" wx:if="{{!showAddAdmin}}">
+      <button class="add-admin-btn" bindtap="onShowAddAdmin">+ 添加管理员</button>
+    </view>
+    <view class="add-admin-form" wx:else>
+      <view class="form-row">
+        <input 
+          class="wechat-input" 
+          placeholder="请输入微信号" 
+          value="{{newAdminWechat}}" 
+          bindinput="onAdminWechatInput"
+          focus="{{true}}"
+        />
+      </view>
+      <view class="form-error" wx:if="{{addAdminError}}">{{addAdminError}}</view>
+      <view class="form-actions">
+        <button class="btn-cancel" bindtap="onCancelAddAdmin">取消</button>
+        <button class="btn-confirm" bindtap="onAddAdmin">确认添加</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 邀请码展示弹窗 -->
+  <view class="modal-mask-invite" wx:if="{{showInviteCode}}" bindtap="onCloseInviteCode"></view>
+  <view class="invite-modal" wx:if="{{showInviteCode}}">
+    <view class="admin-modal-header">
+      <text class="admin-modal-title">邀请码已生成</text>
+      <text class="admin-modal-close" bindtap="onCloseInviteCode">✕</text>
+    </view>
+    <view class="invite-code-box">
+      <text class="invite-code-text">{{adminInviteCode}}</text>
+    </view>
+    <view class="invite-tip">
+      <text>将此邀请码发送给对方，对方在「我的→活动口令激活」输入即可激活管理员身份。</text>
+    </view>
+    <button class="copy-code-btn" bindtap="onCopyInviteCode">复制邀请码</button>
+  </view>
+
+  <!-- 活动口令激活弹窗 -->
+  <view class="modal-mask" wx:if="{{showCdkModal}}" bindtap="onCloseCdkActivate"></view>
+  <view class="invite-modal" wx:if="{{showCdkModal}}">
+    <view class="admin-modal-header">
+      <text class="admin-modal-title">活动口令激活</text>
+      <text class="admin-modal-close" bindtap="onCloseCdkActivate">✕</text>
+    </view>
+    <view class="add-admin-form">
+      <view class="form-row">
+        <input 
+          class="wechat-input" 
+          placeholder="请输入邀请码" 
+          value="{{cdkCode}}" 
+          bindinput="onCdkCodeInput"
+          focus="{{true}}"
+        />
+      </view>
+      <view class="form-error" wx:if="{{cdkError}}">{{cdkError}}</view>
+      <view wx:if="{{cdkError.indexOf('微信号') > -1}}" class="form-actions" style="margin-top:8rpx;">
+        <button class="btn-confirm" bindtap="onGoEditProfile">去填写微信号</button>
+      </view>
+      <view class="form-actions">
+        <button class="btn-cancel" bindtap="onCloseCdkActivate">取消</button>
+        <button class="btn-confirm" bindtap="onConfirmCdkActivate">确认激活</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 社群信息弹窗 -->
+  <view wx:if="{{showCommunityModal}}" class="comm-modal-mask" catchtap="onCloseCommunity" catchtouchmove="stopPropagation">
+    <view class="comm-modal" catchtap="stopPropagation">
+      <!-- 顶部 -->
+      <view class="comm-header">
+        <view>
+          <text class="comm-title">加入社群</text>
+          <text class="comm-subtitle">扫码进群，获取工具更新 & 交流</text>
+        </view>
+        <view class="comm-header-right">
+          <text wx:if="{{isAdmin && !commEditing}}" class="comm-edit" bindtap="onCommStartEdit">编辑</text>
+          <text class="comm-close" bindtap="onCloseCommunity">✕</text>
+        </view>
+      </view>
+
+      <!-- 编辑模式 -->
+      <block wx:if="{{commEditing}}">
+        <scroll-view class="comm-edit-body" scroll-y>
+          <view class="comm-edit-list">
+            <view class="comm-edit-item" wx:for="{{commEditGroups}}" wx:for-item="eg" wx:key="index">
+              <view class="comm-edit-h">
+                <text class="comm-edit-label">{{'群' + (index + 1)}}</text>
+                <view class="comm-edit-del" wx:if="{{commEditGroups.length > 1}}" bindtap="onCommEditDel" data-index="{{index}}">删除</view>
+              </view>
+              <view class="comm-edit-row">
+                <text class="comm-edit-l">名称</text>
+                <input class="comm-edit-inp" placeholder="如：一群" value="{{eg.description}}" data-index="{{index}}" data-field="description" bindinput="onCommEditInput" />
+              </view>
+              <view class="comm-edit-row">
+                <text class="comm-edit-l">二维码</text>
+                <view class="comm-edit-upload">
+                  <image class="comm-edit-thumb" src="{{eg._imageUrl || eg.imageUrl}}" mode="aspectFill" wx:if="{{eg.imageUrl}}" />
+                  <view class="comm-edit-upbtn" bindtap="onCommEditUpload" data-index="{{index}}">{{eg.imageUrl ? '更换' : '上传'}}</view>
+                  <view class="comm-edit-upbtn del" wx:if="{{eg.imageUrl}}" bindtap="onCommEditRemoveQr" data-index="{{index}}">删除</view>
+                </view>
+              </view>
+              <view class="comm-edit-row comm-edit-switch">
+                <text class="comm-edit-l">已满员</text>
+                <switch checked="{{eg.isFull}}" data-index="{{index}}" bindchange="onCommEditToggleFull" color="#EF4444" />
+              </view>
+            </view>
+          </view>
+          <view class="comm-edit-add" bindtap="onCommEditAdd">
+            <text>+ 添加新群</text>
+          </view>
+        </scroll-view>
+        <view class="comm-edit-ft">
+          <view class="comm-edit-cancel" bindtap="onCommEditCancel">取消</view>
+          <view class="comm-edit-save" bindtap="onCommEditSave">保存</view>
+        </view>
+      </block>
+
+      <!-- 浏览模式 -->
+      <block wx:else>
+        <view wx:if="{{commGroups.length === 0}}" class="comm-empty">
+          <text>暂无社群信息</text>
+          <text class="comm-empty-tip">点击右上角「编辑」添加</text>
+        </view>
+
+        <block wx:else>
+          <!-- Tab -->
+          <view wx:if="{{commGroups.length > 1}}" class="comm-tabs">
+            <view 
+              wx:for="{{commGroups}}" 
+              wx:for-item="g" 
+              wx:key="order"
+              class="comm-tab {{commIndex === index ? 'active' : ''}}"
+              bindtap="onCommSwitch" 
+              data-index="{{index}}"
+            >
+              <text>{{'群' + (index + 1)}}</text>
+            </view>
+          </view>
+
+          <!-- 群卡片 -->
+          <swiper class="comm-swiper" current="{{commIndex}}" bindchange="onCommSwiper">
+            <swiper-item wx:for="{{commGroups}}" wx:for-item="g" wx:key="order">
+              <view class="comm-card">
+                <view class="comm-card-top">
+                  <view class="comm-badge {{g.isFull ? 'full' : 'open'}}">
+                    <view class="comm-badge-dot {{g.isFull ? 'full' : 'open'}}"></view>
+                    <text>{{g.isFull ? '已满员' : '招募中'}}</text>
+                  </view>
+                </view>
+                <view class="comm-qr-wrap {{g.isFull ? 'full' : ''}}">
+                  <image class="comm-qr" src="{{g._imageUrl || g.imageUrl}}" mode="aspectFit" show-menu-by-longpress wx:if="{{g.imageUrl}}" />
+                  <view wx:else class="comm-qr-empty"><text>📷 暂无二维码</text></view>
+                  <view class="comm-qr-mask" wx:if="{{g.isFull}}">
+                    <text class="qr-mask-icon">🔒</text>
+                    <text class="qr-mask-title">该群已满员</text>
+                    <text class="qr-mask-sub">请扫描下一群二维码</text>
+                  </view>
+                </view>
+                <view class="comm-name-row">
+                  <text class="comm-name">{{g.description || '群' + (index + 1)}}</text>
+                  <view class="comm-copy" bindtap="onCommCopy" data-name="{{g.description}}">📋 复制</view>
+                </view>
+                <text class="comm-status-text {{g.isFull ? 'full' : 'open'}}">{{g.isFull ? '已满员，暂不可加入' : '正在招募，快来加入！'}}</text>
+              </view>
+            </swiper-item>
+          </swiper>
+
+          <!-- 导航 -->
+          <view wx:if="{{commGroups.length > 1}}" class="comm-nav">
+            <view class="comm-nav-btn {{commIndex === 0 ? 'disabled' : ''}}" bindtap="onCommPrev">‹ 上一群</view>
+            <view class="comm-dots">
+              <view wx:for="{{commGroups}}" wx:key="order" class="comm-dot {{commIndex === index ? 'active' : ''}}" />
+            </view>
+            <view class="comm-nav-btn {{commIndex === commGroups.length - 1 ? 'disabled' : ''}}" bindtap="onCommNext">下一群 ›</view>
+          </view>
+        </block>
+
+        <view class="comm-footer">💡 二维码长期有效，若失效请联系管理员</view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 底部导航栏 -->
+  <view class="tab-bar">
+    <view class="tab-item" bindtap="goToHome">
+      <view class="tab-icon">
+        <image class="nav-svg-icon" src="/assets/icons/home.svg" mode="aspectFit" />
+      </view>
+      <text class="tab-text">首页</text>
+    </view>
+
+    <view class="tab-center" bindtap="onPublishClick">
+      <view class="center-btn">
+        <view class="plus-icon">
+          <view class="plus-h"></view>
+          <view class="plus-v"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="tab-item active" bindtap="goToProfileSelf">
+      <view class="tab-icon">
+        <image class="nav-svg-icon" src="/assets/icons/user-fill-active.svg" mode="aspectFit" />
+      </view>
+      <text class="tab-text">我的</text>
+    </view>
+  </view>
+</view>

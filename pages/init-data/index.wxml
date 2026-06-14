@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="card">
+    <view class="title">云数据库初始化</view>
+    <view class="desc">首次使用需要创建数据库集合并导入初始数据</view>
+    
+    <button class="btn btn-primary" bindtap="onCreateCollections">
+      查看创建集合说明
+    </button>
+    
+    <button class="btn btn-success" bindtap="onImport" disabled="{{importing}}">
+      {{importing ? '导入中...' : '导入初始数据'}}
+    </button>
+
+    <button class="btn btn-purple" bindtap="onSetSuperAdmin" disabled="{{importing}}">
+      设置当前用户为超级管理员
+    </button>
+
+    <view class="result" wx:if="{{result}}">{{result}}</view>
+  </view>
+</view>

@@ -1,0 +1,35 @@
+<view class="tab-bar">
+  <view 
+    wx:for="{{list}}" 
+    wx:key="index" 
+    class="tab-item {{selected === index ? 'active' : ''}}"
+    data-index="{{index}}"
+    bindtap="switchTab"
+  >
+    <view class="tab-icon">
+      <!-- 首页图标 -->
+      <image 
+        wx:if="{{index === 0}}" 
+        class="nav-svg" 
+        src="/assets/icons/home-active.svg"
+        mode="aspectFit"
+      />
+      <!-- 我的图标 -->
+      <image 
+        wx:else
+        class="nav-svg nav-inactive" 
+        src="/assets/icons/user.svg"
+        mode="aspectFit"
+      />
+    </view>
+    <text class="tab-text">{{item.text}}</text>
+  </view>
+
+  <view class="tab-center" bindtap="onCenterTap">
+    <view class="center-btn">
+      <text class="center-icon">+</text>
+    </view>
+  </view>
+
+  <view class="tab-spacer"></view>
+</view>

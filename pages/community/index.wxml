@@ -1,0 +1,155 @@
+<view class="page {{showEditModal ? 'page-masked' : ''}}">
+  <view wx:if="{{loading}}" class="loading-wrap">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <block wx:else>
+    <!-- 顶部标题 -->
+    <view class="header-section">
+      <text class="header-title">加入社群</text>
+      <text class="header-subtitle">扫码进群，获取工具更新 & 交流</text>
+    </view>
+
+    <!-- Tab 切换 -->
+    <view wx:if="{{groups.length > 1}}" class="tab-bar">
+      <view 
+        wx:for="{{groups}}" 
+        wx:for-item="g" 
+        wx:key="order"
+        class="tab-item {{currentIndex === index ? 'active' : ''}}"
+        bindtap="onSwitchTab"
+        data-index="{{index}}"
+      >
+        <text>{{'群' + (index + 1)}}</text>
+        <text wx:if="{{currentIndex === index}}" class="tab-dot">•</text>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{groups.length === 0}}" class="empty-state">
+      <text class="empty-icon">📭</text>
+      <text class="empty-text">暂无社群信息</text>
+      <text class="empty-tip">管理员可点击右下角编辑</text>
+    </view>
+
+    <!-- 社群卡片 -->
+    <swiper 
+      wx:if="{{groups.length > 0}}" 
+      class="group-swiper"
+      current="{{currentIndex}}"
+      bindchange="onSwiperChange"
+    >
+      <swiper-item wx:for="{{groups}}" wx:for-item="g" wx:key="order">
+        <view class="group-card">
+          <!-- 二维码图片 -->
+          <view class="qr-wrap">
+            <image 
+              class="qr-image" 
+              src="{{g._imageUrl || g.imageUrl}}" 
+              mode="aspectFit"
+              show-menu-by-longpress
+              wx:if="{{g.imageUrl}}"
+            />
+            <view wx:else class="qr-placeholder">
+              <text class="qr-placeholder-icon">📷</text>
+              <text class="qr-placeholder-text">暂无二维码</text>
+            </view>
+          </view>
+
+          <!-- 群信息 -->
+          <view class="group-info">
+            <view class="group-name-row">
+              <text class="group-name">{{g.description || '群' + (index + 1)}}</text>
+              <view class="copy-btn" bindtap="onCopyName" data-name="{{g.description}}">
+                <text class="copy-icon">📋</text>
+                <text>复制</text>
+              </view>
+            </view>
+            <text class="group-desc" wx:if="{{g.subDescription}}">{{g.subDescription}}</text>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <!-- 导航按钮 -->
+    <view wx:if="{{groups.length > 1}}" class="nav-bar">
+      <view class="nav-btn {{currentIndex === 0 ? 'disabled' : ''}}" bindtap="onPrev">
+        <text class="nav-arrow">‹</text>
+        <text>上一群</text>
+      </view>
+      <view class="nav-dots">
+        <view 
+          wx:for="{{groups}}" 
+          wx:key="order"
+          class="dot {{currentIndex === index ? 'active' : ''}}"
+        />
+      </view>
+      <view class="nav-btn {{currentIndex === groups.length - 1 ? 'disabled' : ''}}" bindtap="onNext">
+        <text>下一群</text>
+        <text class="nav-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 底部提示 -->
+    <view class="footer-tip">
+      <text class="tip-icon">💡</text>
+      <view class="tip-content">
+        <text class="tip-line">二维码长期有效，若失效请联系管理员</text>
+        <text class="tip-line sub">新群持续招募中，先到先得 🎉</text>
+      </view>
+    </view>
+
+    <!-- 管理员编辑按钮 -->
+    <view wx:if="{{isAdmin}}" class="edit-fab" bindtap="onEdit">
+      <text class="edit-fab-icon">✎</text>
+    </view>
+  </block>
+
+  <!-- 编辑弹窗 -->
+  <view wx:if="{{showEditModal}}" class="modal-overlay" catchtap="onCloseEdit" catchtouchmove="stopPropagation">
+    <view class="modal-sheet" catchtap="stopPropagation">
+      <view class="modal-handle"></view>
+      <view class="modal-header">
+        <text class="modal-title">编辑社群</text>
+        <view class="modal-close" bindtap="onCloseEdit">✕</view>
+      </view>
+      <scroll-view class="modal-body" scroll-y>
+        <view class="edit-list">
+          <view class="edit-item" wx:for="{{editGroups}}" wx:for-item="eg" wx:key="index">
+            <view class="edit-item-header">
+              <text class="edit-item-label">{{'群' + (index + 1)}}</text>
+              <view class="edit-item-del" wx:if="{{editGroups.length > 1}}" bindtap="onRemoveGroup" data-index="{{index}}">删除</view>
+            </view>
+            <view class="edit-form">
+              <view class="edit-row">
+                <text class="edit-label">名称</text>
+                <input class="edit-input" placeholder="如：一群" value="{{eg.description}}" data-index="{{index}}" data-field="description" bindinput="onEditInput" />
+              </view>
+              <view class="edit-row">
+                <text class="edit-label">备注</text>
+                <input class="edit-input" placeholder="如：已满员，请加二群" value="{{eg.subDescription}}" data-index="{{index}}" data-field="subDescription" bindinput="onEditInput" />
+              </view>
+              <view class="edit-row">
+                <text class="edit-label">二维码</text>
+                <view class="edit-upload">
+                  <image class="edit-thumb" src="{{eg._imageUrl || eg.imageUrl}}" mode="aspectFill" wx:if="{{eg.imageUrl}}" />
+                  <view class="edit-upload-btn" bindtap="onUploadQr" data-index="{{index}}">
+                    <text>{{eg.imageUrl ? '更换' : '上传图片'}}</text>
+                  </view>
+                  <view class="edit-upload-btn del" wx:if="{{eg.imageUrl}}" bindtap="onRemoveQr" data-index="{{index}}">删除</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view class="add-btn" bindtap="onAddGroup">
+          <text class="add-icon">+</text>
+          <text>添加新群</text>
+        </view>
+      </scroll-view>
+      <view class="modal-footer">
+        <view class="save-btn" bindtap="onSaveEdit">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,38 @@
+.page { height: 100vh; display: flex; flex-direction: column; background: linear-gradient(180deg, #E8F4F8 0%, #F0F8FF 50%, #E8F4F8 100%); }
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24rpx 32rpx; background: #fff; border-bottom: 1rpx solid #E5E7EB;
+}
+.back-btn { width: 64rpx; height: 64rpx; border-radius: 50%; background: #F3F4F6; display: flex; align-items: center; justify-content: center; }
+.back-icon { font-size: 36rpx; color: #555; font-weight: bold; }
+.header-title { font-size: 32rpx; font-weight: bold; color: #333; }
+.header-placeholder { width: 64rpx; }
+
+.content { flex: 1; padding: 24rpx; display: flex; flex-direction: column; }
+.card { background: #fff; border-radius: 20rpx; padding: 28rpx; margin-bottom: 24rpx; }
+.card:last-child { margin-bottom: 0; }
+.card-title { display: block; font-size: 30rpx; font-weight: bold; color: #1F2937; margin-bottom: 16rpx; }
+.card-body { }
+.card-text { display: block; font-size: 26rpx; color: #4B5563; line-height: 1.6; margin-bottom: 12rpx; }
+.tip-text { font-size: 24rpx; color: #6B7280; background: #F3F4F6; padding: 12rpx 16rpx; border-radius: 10rpx; }
+
+/* 列表 */
+.bullet-list { margin-bottom: 12rpx; }
+.bullet-item { display: flex; gap: 8rpx; margin-bottom: 8rpx; }
+.bullet { font-size: 26rpx; color: #3B82F6; line-height: 1.6; flex-shrink: 0; }
+.bullet-text { font-size: 26rpx; color: #4B5563; line-height: 1.6; }
+
+/* 步骤列表 */
+.step-list { margin-bottom: 12rpx; }
+.step-item { display: flex; gap: 12rpx; margin-bottom: 10rpx; align-items: flex-start; }
+.step-num { 
+  width: 32rpx; height: 32rpx; border-radius: 50%; background: #3B82F6; color: #fff;
+  font-size: 18rpx; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 4rpx;
+}
+.step-desc { flex: 1; font-size: 26rpx; color: #4B5563; line-height: 1.6; }
+
+/* QA列表 */
+.qa-item { margin-bottom: 16rpx; padding-bottom: 16rpx; border-bottom: 1rpx solid #F3F4F6; }
+.qa-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.qa-q { display: block; font-size: 26rpx; font-weight: bold; color: #1F2937; margin-bottom: 6rpx; }
+.qa-a { display: block; font-size: 26rpx; color: #6B7280; line-height: 1.6; }

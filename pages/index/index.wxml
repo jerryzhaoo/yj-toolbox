@@ -1,0 +1,463 @@
+<wxs module="utils">
+  function formatRegion(region) {
+    if (!region) return '';
+    var reg = getRegExp('(.+?省)?(.+?市)?(.+?[区县])?');
+    var m = reg.exec(region);
+    if (m) {
+      var arr = [];
+      if (m[1]) arr.push(m[1]);
+      if (m[2]) arr.push(m[2]);
+      if (m[3]) arr.push(m[3]);
+      return arr.join('-');
+    }
+    return region;
+  }
+  module.exports.formatRegion = formatRegion;
+</wxs>
+
+<view class="page {{scrollLocked ? 'scroll-locked' : ''}}">
+  <!-- 顶部搜索栏（暂时隐藏） -->
+  <!-- <view class="search-bar">
+    <view class="search-input">
+      <view class="icon-search"><text>⌕</text></view>
+
+      <input placeholder="搜索活动、群组" placeholder-class="placeholder" />
+    </view>
+
+  </view>
+ -->
+
+  <!-- Banner轮播 -->
+  <view class="banner-container">
+    <view class="banner-inner">
+      <swiper
+        current="{{currentSlide}}"
+        circular="{{banners.length > 1}}"
+        autoplay="{{banners.length > 1}}"
+        interval="4000"
+        duration="300"
+        bindchange="onSwiperChange"
+        style="height: 220rpx;"
+      >
+        <block wx:for="{{banners}}" wx:key="_id">
+          <swiper-item>
+            <block wx:if="{{item.bannerImage}}">
+              <view class="banner-slide" data-banner="{{item}}" bindtap="onBannerClick" bindlongpress="{{isAdmin ? 'onBannerLongPress' : ''}}">
+                <image class="banner-full-img" src="{{item._bannerImageUrl || item.bannerImage}}" mode="scaleToFill" />
+              </view>
+
+            </block>
+            <block wx:else>
+              <view class="banner-slide banner-style{{index % 5}}" data-banner="{{item}}" bindtap="onBannerClick" bindlongpress="{{isAdmin ? 'onBannerLongPress' : ''}}">
+                <view class="banner-deco banner-deco-1"></view>
+
+                <view class="banner-deco banner-deco-2"></view>
+
+                <view class="banner-content">
+                  <view class="banner-left">
+                    <text class="banner-title">{{item.title}}</text>
+                    <text class="banner-desc">{{item.subtitle}}</text>
+                  </view>
+
+                </view>
+
+              </view>
+
+            </block>
+          </swiper-item>
+        </block>
+      </swiper>
+    </view>
+
+    <view wx:if="{{banners.length > 1}}" class="banner-dots">
+      <view wx:for="{{banners}}" wx:key="_id" class="dot {{index === currentSlide ? 'active' : ''}}"></view>
+
+    </view>
+
+  </view>
+
+
+  <!-- 分类标签栏 -->
+  <view class="tabs-container" id="tabsContainer">
+    <!-- 拼团中标题区 - 多彩竖条样式 -->
+    <view class="section-header">
+      <view class="header-content">
+        <view class="header-title-row">
+          <view class="header-bars">
+            <view class="header-bar" style="background: {{barColors[0]}}"></view>
+
+            <view class="header-bar" style="background: {{barColors[1]}}"></view>
+
+            <view class="header-bar" style="background: {{barColors[2]}}"></view>
+
+          </view>
+
+          <text class="header-title-text">拼团中</text>
+        </view>
+
+      </view>
+
+      <view class="header-divider"></view>
+
+    </view>
+
+
+    <!-- 筛选按钮 -->
+    <view class="filter-row">
+      <view class="filter-left">
+        <block wx:if="{{activeTab === '月卡转让'}}">
+          <view class="filter-btn {{sortBy === '综合' ? 'active' : ''}}" bindtap="onSortTap" data-sort="综合">
+            <text>综合</text>
+          </view>
+
+          <view class="filter-btn {{sortBy === '最新' ? 'active' : ''}}" bindtap="onSortTap" data-sort="最新">
+            <text>最新</text>
+          </view>
+
+        </block>
+      </view>
+
+
+      <!-- 视图切换按钮（仅月卡转让） -->
+      <block wx:if="{{activeTab === '月卡转让'}}">
+        <view class="view-toggle">
+          <view 
+            class="toggle-btn {{viewMode === 'grid' ? 'active' : ''}}"
+            bindtap="onViewModeChange"
+            data-mode="grid"
+          >
+            <text class="toggle-grid">⊞</text>
+          </view>
+
+          <view 
+            class="toggle-btn {{viewMode === 'list' ? 'active' : ''}}"
+            bindtap="onViewModeChange"
+            data-mode="list"
+          >
+            <text class="toggle-list">☰</text>
+          </view>
+
+        </view>
+
+      </block>
+    </view>
+
+  </view>
+
+
+  <!-- 内容列表 -->
+  <view class="content-list">
+    <!-- 拼团中：大卡片列表 -->
+    <block wx:if="{{activeTab === '拼团中'}}">
+      <view class="card-list">
+        <block wx:for="{{groupBuyingData}}" wx:key="_id">
+          <view 
+            id="card-{{item._id}}"
+            class="activity-card card"
+            data-activity="{{item}}"
+            bindtap="onActivityClick"
+            bindlongpress="onLongPressCard"
+          >
+            <!-- 卡片图片区域 -->
+            <view class="card-image {{item.isExpired ? 'image-expired' : 'card-template' + (item.styleIndex % 7 + 1)}}">
+              <block wx:if="{{item.isExpired}}">
+                <view class="expired-overlay">
+                  <text class="expired-text">已截止</text>
+                </view>
+
+              </block>
+              <view class="card-content">
+                <text class="card-title">{{item.title}}</text>
+                <view class="card-badge badge-location" wx:if="{{item.locationName}}">
+                  {{item.locationName}}
+                </view>
+
+                <view class="card-price-row" wx:if="{{item.groupPrice && item.originalPrice}}">
+                  <text class="card-group-price">¥{{item.groupPrice}}</text>
+                  <text class="card-original-price">¥{{item.originalPrice}}</text>
+                </view>
+
+              </view>
+
+              <view class="card-icon {{item.isExpired ? 'icon-gray' : ''}}">
+                <image 
+                  class="card-svg-icon {{item.isExpired ? 'icon-faded' : ''}}" 
+                  src="/assets/icons/car.svg" 
+                  mode="aspectFit"
+                />
+              </view>
+
+            </view>
+
+
+            <!-- 卡片信息 -->
+            <view class="card-info">
+              <view class="info-top">
+                <view class="info-tags">
+                  <text class="tag {{item.isExpired ? 'tag-gray' : 'tag-yellow'}}">{{item.isExpired ? '已截止' : '拼月卡'}}</text>
+                  <text class="creator-name" wx:if="{{item.creatorNickname}}">{{item.creatorNickname}}</text>
+                </view>
+
+                <text class="date-range" wx:if="{{item.validFrom || item.validUntil}}">{{item.validFrom}} 至 {{item.validUntil}}</text>
+              </view>
+
+              <view class="info-bottom">
+                <text class="people-count {{item.isExpired ? 'gray' : 'orange'}}">
+                  已报名<text class="count-num">{{item.currentMonths || 0}}</text><text wx:if="{{item.targetMonths}}">/{{item.targetMonths}}</text>个月
+                </text>
+                <view class="join-btn {{item.isExpired ? 'btn-disabled' : ''}}">
+                  {{item.isExpired ? '已截止' : '报名上车'}}
+                </view>
+
+              </view>
+
+            </view>
+
+          </view>
+
+        </block>
+      </view>
+
+    </block>
+
+    <!-- 月卡转让：网格视图 -->
+    <block wx:elif="{{activeTab === '月卡转让' && viewMode === 'grid'}}">
+      <view class="grid-container">
+        <block wx:for="{{transferData}}" wx:key="_id">
+          <view 
+            class="grid-card card"
+            data-item="{{item}}"
+            bindtap="onGridCardClick"
+          >
+            <view class="grid-image {{item.images && item.images.length > 0 ? '' : 'grid-template' + ((index % 6) + 1)}}">
+              <image 
+                wx:if="{{item.images && item.images.length > 0}}" 
+                class="grid-thumb-img" 
+                src="{{item.images[0]}}" 
+                mode="widthFix" 
+              />
+              <view wx:else class="image-placeholder-box">
+                <text class="placeholder-text">IMG</text>
+              </view>
+
+            </view>
+
+            <view class="grid-info">
+              <text class="grid-title">{{item.title}}</text>
+              <block wx:if="{{item.price}}">
+                <text class="grid-price">¥{{item.price}}</text>
+              </block>
+              <text class="meta-item meta-location">◉ {{utils.formatRegion(item.region || item.location)}}</text>
+              <text class="meta-item meta-time">⏱ {{item.validFrom ? item.validFrom + ' 至 ' : ''}}{{item.validUntil || ''}}</text>
+            </view>
+
+          </view>
+
+        </block>
+      </view>
+
+    </block>
+
+    <!-- 月卡转让：列表视图 -->
+    <block wx:elif="{{activeTab === '月卡转让' && viewMode === 'list'}}">
+      <view class="list-container">
+        <block wx:for="{{transferData}}" wx:key="_id">
+          <view 
+            class="list-card card"
+            data-item="{{item}}"
+            bindtap="onGridCardClick"
+          >
+            <view class="list-left {{item.images && item.images.length > 0 ? '' : 'grid-template' + ((index % 6) + 1)}}">
+              <image 
+                wx:if="{{item.images && item.images.length > 0}}" 
+                class="list-thumb-img" 
+                src="{{item.images[0]}}" 
+                mode="aspectFill" 
+              />
+              <view wx:else class="image-placeholder-box">
+                <text class="placeholder-text">IMG</text>
+              </view>
+
+            </view>
+
+            <view class="list-right">
+              <text class="list-title">{{item.title}}</text>
+              <text class="list-desc">{{item.description}}</text>
+              <text class="meta-item meta-location">◉ {{utils.formatRegion(item.region || item.location)}}</text>
+              <text class="meta-item meta-time">⏱ {{item.validFrom ? item.validFrom + ' 至 ' : ''}}{{item.validUntil || ''}}</text>
+              <block wx:if="{{item.price}}">
+                <text class="list-price">转让价 ¥{{item.price}}<text wx:if="{{item.originalPrice}}" class="list-original-price"> 原价 ¥{{item.originalPrice}}</text></text>
+              </block>
+            </view>
+
+          </view>
+
+        </block>
+      </view>
+
+    </block>
+  </view>
+
+
+  <!-- 底部导航栏 -->
+  <view class="tab-bar">
+    <view class="tab-item active" bindtap="onHomeTap">
+      <view class="tab-icon">
+        <image class="nav-svg-icon" src="/assets/icons/home-fill-active.svg" mode="aspectFit" />
+      </view>
+
+      <text class="tab-text">首页</text>
+    </view>
+
+
+    <view class="tab-center" bindtap="onPublishClick">
+      <view class="center-btn">
+        <view class="plus-icon">
+          <view class="plus-h"></view>
+
+          <view class="plus-v"></view>
+
+        </view>
+
+      </view>
+
+    </view>
+
+
+    <view class="tab-item" bindtap="goToProfile">
+      <view class="tab-icon">
+        <image class="nav-svg-icon" src="/assets/icons/user.svg" mode="aspectFit" />
+      </view>
+
+      <text class="tab-text">我的</text>
+    </view>
+
+  </view>
+
+
+  <!-- 管理菜单（卡片上方浮层） -->
+  <view wx:if="{{showContextMenu}}" class="ctx-backdrop" catchtap="onCloseContextMenu" catchtouchmove="stopPropagation">
+    <view 
+      class="ctx-popup" 
+      style="top:{{popupTop}}px;left:{{popupLeft}}px;"
+      catchtap="stopPropagation"
+      catchtouchmove="stopPropagation"
+    >
+      <view class="ctx-row" catchtap="onCopyActivity">
+        <text class="ctx-icon">⎘</text>
+        <text class="ctx-text">复制</text>
+      </view>
+
+      <view class="ctx-divider"></view>
+
+      <view class="ctx-row ctx-del-row" catchtap="onDeleteActivity">
+        <text class="ctx-icon del-icon">✕</text>
+        <text class="ctx-text del-text">删除</text>
+      </view>
+
+    </view>
+
+  </view>
+
+
+  <!-- Banner管理菜单 -->
+  <view wx:if="{{showBannerMenu}}" class="ctx-backdrop" catchtap="onCloseBannerMenu" catchtouchmove="stopPropagation">
+    <view class="ctx-popup banner-ctx" style="top:{{bannerMenuTop}}px;left:{{bannerMenuLeft}}px;" catchtap="stopPropagation">
+      <view class="ctx-row" catchtap="onBannerEdit">
+        <text class="ctx-icon">✎</text>
+        <text class="ctx-text">编辑</text>
+      </view>
+
+      <view class="ctx-divider"></view>
+
+      <view class="ctx-row" catchtap="onBannerCopy">
+        <text class="ctx-icon">⎘</text>
+        <text class="ctx-text">复制新增</text>
+      </view>
+
+      <view class="ctx-divider"></view>
+
+      <view class="ctx-row ctx-del-row" catchtap="onBannerDelete">
+        <text class="ctx-icon del-icon">✕</text>
+        <text class="ctx-text del-text">删除</text>
+      </view>
+
+    </view>
+
+  </view>
+
+
+  <!-- Banner编辑弹窗 -->
+  <view wx:if="{{showBannerEditor}}" class="modal-mask" catchtap="onCloseBannerEditor" catchtouchmove="stopPropagation">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">{{isNewBanner ? '新增' : '编辑'}}Banner</text>
+        <view class="modal-close" catchtap="onCloseBannerEditor"><text>✕</text></view>
+
+      </view>
+
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">Banner图片（非必填，上传后首页只展示此图）</text>
+          <text class="form-tip">建议比例750x220，最大3M</text>
+          <view class="banner-image-single-row">
+            <block wx:if="{{bannerEditor.bannerImage}}">
+              <view class="banner-preview-wrap">
+                <image class="banner-preview-img" src="{{bannerEditor.bannerImage}}" mode="aspectFill" />
+                <view class="banner-preview-remove" catchtap="onBannerRemoveBannerImage"><text>✕</text></view>
+
+              </view>
+
+            </block>
+            <view wx:else class="banner-upload-btn" catchtap="onBannerUploadBannerImage">
+              <text>+</text>
+            </view>
+
+          </view>
+
+        </view>
+
+        <view class="form-group">
+          <text class="form-label"><text class="required-star">*</text>标题（最多7字）</text>
+          <input class="form-input" placeholder="请输入banner标题" value="{{bannerEditor.title}}" data-field="title" bindinput="onBannerEditorInput" maxlength="7" />
+        </view>
+
+        <view class="form-group">
+          <text class="form-label"><text class="required-star">*</text>描述（10~30字）</text>
+          <input class="form-input" placeholder="首页展示的简短描述，至少10个字" value="{{bannerEditor.subtitle}}" data-field="subtitle" bindinput="onBannerEditorInput" maxlength="30" />
+        </view>
+
+        <view class="form-group">
+          <text class="form-label"><text class="required-star">*</text>正文（点击banner查看详情）</text>
+          <textarea class="form-textarea" placeholder="请输入正文内容" value="{{bannerEditor.content}}" data-field="content" bindinput="onBannerEditorInput" style="height:200rpx;" />
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">配图（最多3张）</text>
+          <view class="banner-images-row">
+            <view wx:for="{{bannerEditor.images}}" wx:key="index" class="banner-preview-wrap">
+              <image class="banner-preview-img" src="{{item}}" mode="aspectFill" />
+              <view class="banner-preview-remove" catchtap="onBannerRemoveImage" data-index="{{index}}"><text>✕</text></view>
+
+            </view>
+
+            <view wx:if="{{bannerEditor.images.length < 3}}" class="banner-upload-btn" catchtap="onBannerUploadImage">
+              <text>+</text>
+            </view>
+
+          </view>
+
+        </view>
+
+      </view>
+
+      <view class="modal-btns">
+        <button type="button" class="btn-cancel" catchtap="onCloseBannerEditor">取消</button>
+        <button type="button" class="btn-submit" catchtap="onBannerSave">保存</button>
+      </view>
+
+    </view>
+
+  </view>
+
+</view>
