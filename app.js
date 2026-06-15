@@ -8,6 +8,8 @@ App({
   },
 
   onLaunch() {
+    // 强制版本更新
+    this.checkUpdate();
     // 强制简体中文
     this.setLocale();
     // 初始化云开发
@@ -26,6 +28,45 @@ App({
     try {
       wx.setLocale({ locale: 'zh_CN' });
     } catch (e) {}
+  },
+
+  /**
+   * 强制版本更新：检测到新版本时弹窗，用户确认后立即重启
+   */
+  checkUpdate() {
+    try {
+      const updateManager = wx.getUpdateManager();
+
+      updateManager.onCheckForUpdate((res) => {
+        console.log('[更新] 是否有新版本:', res.hasUpdate);
+      });
+
+      updateManager.onUpdateReady(() => {
+        wx.showModal({
+          title: '更新提示',
+          content: '发现新版本，请重启小程序以使用最新功能',
+          showCancel: false, // 强制更新，不可取消
+          confirmText: '立即重启',
+          success: (res) => {
+            if (res.confirm) {
+              updateManager.applyUpdate();
+            }
+          }
+        });
+      });
+
+      updateManager.onUpdateFailed(() => {
+        // 更新失败：让用户删除小程序重试
+        wx.showModal({
+          title: '更新失败',
+          content: '新版本下载失败，请删除当前小程序后重新搜索打开',
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      });
+    } catch (e) {
+      console.warn('[更新] 更新管理器不可用', e);
+    }
   },
 
   /**
