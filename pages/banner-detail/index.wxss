@@ -1,4 +1,4 @@
-.page { min-height: 100vh; background: linear-gradient(180deg, #E8F4F8 0%, #F0F8FF 50%, #E8F4F8 100%); }
+.page { min-height: 100vh; background: #F5F4FA; }
 .header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 24rpx 32rpx; background: #fff; border-bottom: 1rpx solid #E5E7EB;

@@ -16,7 +16,7 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "拼拼",
     "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#E8F4F8"
+    "backgroundColor": "#F5F4FA"
   },
   "tabBar": {
     "custom": false,

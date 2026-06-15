@@ -172,7 +172,7 @@ Page({
     });
   },
 
-  // 选择头像（上传到云存储）
+  // 选择头像（先选图再裁剪为正方形，然后上传到云存储并自动保存）
   async onChooseAvatar() {
     try {
       const res = await wx.chooseImage({
@@ -181,16 +181,49 @@ Page({
         sourceType: ['album', 'camera'],
       });
       const tempFilePath = res.tempFilePaths[0];
+
+      // 弹出正方形裁剪框让用户调整
+      const cropRes = await new Promise((resolve, reject) => {
+        wx.cropImage({
+          src: tempFilePath,
+          cropScale: '1:1',
+          success: (res) => resolve(res),
+          fail: (err) => reject(err),
+        });
+      });
+
       wx.showLoading({ title: '上传中...' });
       const cloudRes = await wx.cloud.uploadFile({
         cloudPath: `avatars/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.png`,
-        filePath: tempFilePath,
+        filePath: cropRes.tempFilePath,
       });
+      const fileID = cloudRes.fileID;
+      this.setData({ 'formData.avatar': fileID });
+
+      // 自动保存到云数据库
+      const { userId } = this.data;
+      if (userId) {
+        await db.collection('users').doc(userId).update({
+          data: { avatar: fileID, updatedAt: db.serverDate() }
+        });
+      } else {
+        const result = await db.collection('users').add({
+          data: { avatar: fileID, updatedAt: db.serverDate() }
+        });
+        this.setData({ userId: result._id });
+      }
+      // 同步到本地存储
+      const userInfo = wx.getStorageSync('userInfo') || {};
+      userInfo.avatar = fileID;
+      wx.setStorageSync('userInfo', userInfo);
+
       wx.hideLoading();
-      this.setData({ 'formData.avatar': cloudRes.fileID });
+      wx.showToast({ title: '头像已更新', icon: 'success' });
     } catch (err) {
       wx.hideLoading();
+      if (err.errMsg && err.errMsg.indexOf('cancel') > -1) return;
       console.error('上传头像失败:', err);
+      wx.showToast({ title: '上传失败', icon: 'error' });
     }
   },
 

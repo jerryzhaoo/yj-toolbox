@@ -1,7 +1,7 @@
 /* 页面容器 */
 .page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #E8F4F8 0%, #F0F8FF 50%, #E8F4F8 100%);
+  background: #F5F4FA;
   padding-bottom: 40rpx;
 }
 

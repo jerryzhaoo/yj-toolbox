@@ -1,94 +1,106 @@
 <view class="page">
-  <!-- 顶部用户信息 -->
-  <view class="user-header">
-    <view class="user-info">
-      <view class="avatar">
+  <!-- 头部渐变区域 -->
+  <view class="header-gradient">
+    <!-- 用户信息行 -->
+    <view class="user-row">
+      <view class="avatar-wrap" bindtap="onPreviewAvatar">
         <image wx:if="{{userData.avatar}}" class="avatar-img" src="{{userData.avatar}}" mode="aspectFill" />
-        <image wx:else class="avatar-svg" src="/assets/icons/user.svg" mode="aspectFit" />
+        <image wx:else class="avatar-placeholder" src="/assets/icons/user.svg" mode="aspectFit" />
       </view>
-      <view class="user-detail">
-        <text class="user-name">{{userData.name || '用户昵称'}}</text>
-        <text class="user-gender">{{userData.gender || '未设置'}}</text>
-      </view>
-      <view class="edit-btn" bindtap="onEditProfileDirect">
-        <text class="edit-icon">✎</text>
+      <view class="user-info">
+        <view class="name-row">
+          <text class="user-name">{{userData.name || '用户昵称'}}</text>
+          <text wx:if="{{userData.gender}}" class="user-gender-tag">{{userData.gender}}</text>
+        </view>
+        <view class="edit-btn" bindtap="onEditProfileDirect">
+          <text class="edit-btn-icon">✎</text>
+          <text class="edit-btn-text">编辑资料</text>
+        </view>
       </view>
     </view>
-  </view>
 
-  <!-- 统计卡片 -->
-  <view class="stats-container">
-    <view class="stats-grid">
-      <view class="stat-card" bindtap="onMyPosts">
-        <view class="stat-icon blue">
-          <image class="stat-svg" src="/assets/icons/document.svg" mode="aspectFit" />
-        </view>
+    <!-- 统计数据块 -->
+    <view class="stats-block">
+      <view class="stat-item" bindtap="onMyPosts">
         <text class="stat-count">{{userData.myPostsCount}}</text>
         <text class="stat-label">我发布的</text>
       </view>
-      <view class="stat-card" bindtap="onMyJoined">
-        <view class="stat-icon orange">
-          <image class="stat-svg" src="/assets/icons/trophy.svg" mode="aspectFit" />
-        </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="onMyJoined">
         <text class="stat-count">{{userData.myJoinedCount}}</text>
         <text class="stat-label">我参与的</text>
       </view>
     </view>
   </view>
 
-  <!-- 菜单列表 -->
-  <view class="menu-container">
-    <view class="menu-list">
+  <!-- 菜单区域 -->
+  <view class="menu-area">
+    <!-- 第一组 -->
+    <view class="menu-card">
       <view class="menu-item" bindtap="onEditProfile">
         <view class="menu-left">
-          <view class="menu-icon blue-bg">
+          <view class="menu-icon purple-bg">
             <image class="menu-svg" src="/assets/icons/user.svg" mode="aspectFit" />
           </view>
-          <text class="menu-text">预设报名信息</text>
+          <view class="menu-text-wrap">
+            <text class="menu-title">预设报名信息</text>
+            <text class="menu-subtitle">快速填写报名人信息</text>
+          </view>
         </view>
         <text class="menu-arrow">›</text>
       </view>
-
-      <!-- 使用帮助 -->
+      <view class="divider"></view>
       <view class="menu-item" bindtap="onHelp">
         <view class="menu-left">
-          <view class="menu-icon green-bg">
+          <view class="menu-icon blue-bg">
             <image class="menu-svg" src="/assets/icons/document.svg" mode="aspectFit" />
           </view>
-          <text class="menu-text">使用帮助</text>
+          <view class="menu-text-wrap">
+            <text class="menu-title">使用帮助</text>
+            <text class="menu-subtitle">了解如何使用工具</text>
+          </view>
         </view>
         <text class="menu-arrow">›</text>
       </view>
+    </view>
 
-      <!-- 社群信息 -->
+    <!-- 第二组 -->
+    <view class="menu-card">
       <view class="menu-item" bindtap="onCommunity">
         <view class="menu-left">
-          <view class="menu-icon light-green-bg">
+          <view class="menu-icon pink-bg">
             <image class="menu-svg" src="/assets/icons/heart.svg" mode="aspectFit" />
           </view>
-          <text class="menu-text">社群信息</text>
+          <view class="menu-text-wrap">
+            <text class="menu-title">社群信息</text>
+            <text class="menu-subtitle">获取最新动态和交流</text>
+          </view>
         </view>
         <text class="menu-arrow">›</text>
       </view>
-
-      <!-- 活动口令激活入口（始终可见） -->
+      <view class="divider"></view>
       <view class="menu-item" bindtap="onShowCdkActivate">
         <view class="menu-left">
-          <view class="menu-icon light-green-bg">
+          <view class="menu-icon green-bg">
             <image class="menu-svg" src="/assets/icons/message.svg" mode="aspectFit" />
           </view>
-          <text class="menu-text">活动口令激活</text>
+          <view class="menu-text-wrap">
+            <text class="menu-title">活动口令激活</text>
+            <text class="menu-subtitle">输入邀请码激活管理员</text>
+          </view>
         </view>
         <text class="menu-arrow">›</text>
       </view>
-
-      <!-- 管理员配置入口（仅超级管理员可见） -->
+      <view class="divider" wx:if="{{adminChecked && isSuperAdmin}}"></view>
       <view class="menu-item" bindtap="onManageAdmins" wx:if="{{adminChecked && isSuperAdmin}}">
         <view class="menu-left">
-          <view class="menu-icon purple-bg">
+          <view class="menu-icon yellow-bg">
             <image class="menu-svg" src="/assets/icons/shield.svg" mode="aspectFit" />
           </view>
-          <text class="menu-text">管理员配置</text>
+          <view class="menu-text-wrap">
+            <text class="menu-title">管理员配置</text>
+            <text class="menu-subtitle">管理小程序管理员</text>
+          </view>
         </view>
         <text class="menu-arrow">›</text>
       </view>
@@ -272,12 +284,6 @@
           <swiper class="comm-swiper" current="{{commIndex}}" bindchange="onCommSwiper">
             <swiper-item wx:for="{{commGroups}}" wx:for-item="g" wx:key="order">
               <view class="comm-card">
-                <view class="comm-card-top">
-                  <view class="comm-badge {{g.isFull ? 'full' : 'open'}}">
-                    <view class="comm-badge-dot {{g.isFull ? 'full' : 'open'}}"></view>
-                    <text>{{g.isFull ? '已满员' : '招募中'}}</text>
-                  </view>
-                </view>
                 <view class="comm-qr-wrap {{g.isFull ? 'full' : ''}}">
                   <image class="comm-qr" src="{{g._imageUrl || g.imageUrl}}" mode="aspectFit" show-menu-by-longpress wx:if="{{g.imageUrl}}" />
                   <view wx:else class="comm-qr-empty"><text>📷 暂无二维码</text></view>
@@ -289,7 +295,9 @@
                 </view>
                 <view class="comm-name-row">
                   <text class="comm-name">{{g.description || '群' + (index + 1)}}</text>
-                  <view class="comm-copy" bindtap="onCommCopy" data-name="{{g.description}}">📋 复制</view>
+                  <view class="comm-inline-tag {{g.isFull ? 'full' : 'open'}}">
+                    <text>{{g.isFull ? '已满员' : '招募中'}}</text>
+                  </view>
                 </view>
                 <text class="comm-status-text {{g.isFull ? 'full' : 'open'}}">{{g.isFull ? '已满员，暂不可加入' : '正在招募，快来加入！'}}</text>
               </view>

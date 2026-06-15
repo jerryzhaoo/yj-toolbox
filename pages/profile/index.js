@@ -256,6 +256,13 @@ Page({
     }
   },
 
+  // 预览头像
+  onPreviewAvatar() {
+    const avatar = this.data.userData.avatar;
+    if (avatar) {
+      wx.previewImage({ urls: [avatar] });
+    }
+  },
   // 编辑个人信息
   onEditProfile() { wx.navigateTo({ url: '/pages/user-info-edit/index' }); },
   onEditProfileDirect() { wx.navigateTo({ url: '/pages/user-info-edit/index?edit=1' }); },

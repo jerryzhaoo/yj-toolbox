@@ -1,7 +1,7 @@
 .container {
   padding: 40rpx;
   min-height: 100vh;
-  background: #E8F4F8;
+  background: #F5F4FA;
 }
 
 .card {
