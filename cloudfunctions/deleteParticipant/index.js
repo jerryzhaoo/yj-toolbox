@@ -16,7 +16,6 @@ exports.main = async (event, context) => {
       _openid: wxContext.OPENID,
     }).limit(1).get()
     let isAdmin = adminRes.data.length > 0
-    // 兼容邀请码激活（自定义 openid 字段）
     if (!isAdmin) {
       const r2 = await db.collection('admins').where({
         openid: wxContext.OPENID,

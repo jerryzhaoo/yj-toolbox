@@ -534,34 +534,29 @@ Page({
     const activity = e.currentTarget.dataset.activity;
     if (!activity) return;
     wx.vibrateShort({ type: 'medium' }).catch(() => {});
-    // 获取卡片位置，居中展示菜单
+    const winInfo = wx.getWindowInfo();
+    const rpxToPx = winInfo.windowWidth / 750;
+    const popupW = 240 * rpxToPx;
+    const popupH = 160 * rpxToPx;
+    // longpress 的 e.detail.x/y 是触摸点相对于页面的坐标（含滚动偏移）
+    // 弹窗 position:fixed 需要的是视口坐标，所以减去滚动偏移
     const query = wx.createSelectorQuery();
-    query.select(`#card-${activity._id}`).boundingClientRect(rect => {
-      const sysInfo = wx.getSystemInfoSync();
-      const rpxToPx = sysInfo.windowWidth / 750;
-      const popupW = 240 * rpxToPx;
-      const popupH = 160 * rpxToPx;
-      if (rect) {
-        const centerX = rect.left + rect.width / 2 - popupW / 2;
-        const centerY = rect.top + rect.height / 2 - popupH / 2;
-        this.setData({
-          showContextMenu: true,
-          contextActivityId: activity._id,
-          contextActivityData: activity,
-          scrollLocked: true,
-          popupTop: Math.max(10, centerY),
-          popupLeft: Math.max(10, centerX),
-        });
-      } else {
-        this.setData({
-          showContextMenu: true,
-          contextActivityId: activity._id,
-          contextActivityData: activity,
-          scrollLocked: true,
-          popupTop: Math.max(10, sysInfo.windowHeight / 2 - popupH / 2),
-          popupLeft: Math.max(10, sysInfo.windowWidth / 2 - popupW / 2),
-        });
-      }
+    query.selectViewport().scrollOffset(offset => {
+      const scrollY = offset.scrollTop || 0;
+      // 触摸点视口坐标 = 页面坐标 - 滚动偏移 - 弹窗尺寸/2（居中）
+      let posLeft = e.detail.x - popupW / 2;
+      let posTop = (e.detail.y - scrollY) - popupH / 2;
+      // 边界限制
+      posLeft = Math.max(10, Math.min(posLeft, winInfo.windowWidth - popupW - 10));
+      posTop = Math.max(10, Math.min(posTop, winInfo.windowHeight - popupH - 10));
+      this.setData({
+        showContextMenu: true,
+        contextActivityId: activity._id,
+        contextActivityData: activity,
+        scrollLocked: true,
+        popupTop: posTop,
+        popupLeft: posLeft,
+      });
     }).exec();
   },
 
@@ -612,13 +607,18 @@ Page({
         if (res.confirm) {
           wx.showLoading({ title: '删除中...' });
           try {
-            await db.collection('activities').doc(id).remove();
-            const partRes = await db.collection('participants').where({ activityId: id }).get();
-            const deleteTasks = partRes.data.map(p => db.collection('participants').doc(p._id).remove());
-            await Promise.all(deleteTasks);
+            const res = await wx.cloud.callFunction({
+              name: 'deleteActivity',
+              data: { activityId: id },
+            });
+            if (!res.result || !res.result.success) {
+              wx.hideLoading();
+              wx.showToast({ title: res.result?.msg || '删除失败', icon: 'error' });
+              return;
+            }
             wx.hideLoading();
             wx.showToast({ title: '已删除', icon: 'success' });
-            this.loadActivities();
+            setTimeout(() => this.loadActivities(), 500);
           } catch (err) {
             wx.hideLoading();
             console.error('删除活动失败:', err);

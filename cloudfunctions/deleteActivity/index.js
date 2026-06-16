@@ -9,9 +9,17 @@ exports.main = async (event) => {
   const wxContext = cloud.getWXContext();
   const openid = wxContext.OPENID;
 
-  // 检查是否为管理员
-  const adminRes = await db.collection('admins').where({ _openid: openid }).limit(1).get();
-  if (adminRes.data.length === 0) {
+  // 检查是否为管理员（兼容 _openid 和自定义 openid 两种模式）
+  let adminRes = await db.collection('admins').where({ _openid: openid }).limit(1).get();
+  let isAdmin = adminRes.data.length > 0;
+  if (!isAdmin) {
+    const r2 = await db.collection('admins').where({
+      openid: openid,
+      activated: true,
+    }).limit(1).get();
+    isAdmin = r2.data.length > 0;
+  }
+  if (!isAdmin) {
     return { success: false, msg: '仅管理员可删除活动' };
   }
 

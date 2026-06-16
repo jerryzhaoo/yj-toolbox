@@ -642,8 +642,9 @@ Page({
 
       // 获取当前用户昵称
       const userInfo = wx.getStorageSync('userInfo') || {};
-      if (userInfo.name) {
-        formData.creatorNickname = userInfo.name;
+      const creatorName = userInfo.name || (userInfo.formData && userInfo.formData.name) || '';
+      if (creatorName) {
+        formData.creatorNickname = creatorName;
       }
 
       if (this.data.isEditing && this.data.editId) {
