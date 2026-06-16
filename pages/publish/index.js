@@ -1,6 +1,7 @@
 const app = getApp();
 const db = wx.cloud.database();
 const cache = require('../../utils/cache');
+const privacy = require('../../utils/privacy');
 
 Page({
   data: {
@@ -71,6 +72,9 @@ Page({
       workTime: '',
       description: '',
     },
+    showPrivacyModal: false,
+    privacyPurposes: [],
+    pendingSave: null,
   },
 
   types: ['group', 'transfer', 'secondhand', 'job'],
@@ -351,6 +355,23 @@ Page({
     }
   },
 
+  // 隐私授权 - 同意
+  onPrivacyAgree() {
+    privacy.setAgreed();
+    this.setData({ showPrivacyModal: false });
+    const pending = this.data.pendingSave;
+    if (pending) {
+      this.setData({ pendingSave: null });
+      pending();
+    }
+  },
+
+  // 隐私授权 - 不同意
+  onPrivacyDisagree() {
+    this.setData({ showPrivacyModal: false, pendingSave: null });
+    wx.showToast({ title: '已取消保存', icon: 'none' });
+  },
+
   // 保存转账信息到预设
   async onSaveBankToPreset() {
     const { bankAccountName, bankCardNumber, bankName } = this.data.groupForm;
@@ -358,6 +379,21 @@ Page({
       wx.showToast({ title: '请先填写完整的转账信息', icon: 'none' });
       return;
     }
+    // 检查隐私授权
+    if (!privacy.hasAgreed()) {
+      const purposes = privacy.getPurposesByKeys(['bank']);
+      this.setData({
+        privacyPurposes: purposes,
+        showPrivacyModal: true,
+        pendingSave: () => this._doSaveBankToPreset(),
+      });
+      return;
+    }
+    await this._doSaveBankToPreset();
+  },
+
+  async _doSaveBankToPreset() {
+    const { bankAccountName, bankCardNumber, bankName } = this.data.groupForm;
     wx.showLoading({ title: '保存中...' });
     try {
       const openidRes = await wx.cloud.callFunction({ name: 'getOpenid' });

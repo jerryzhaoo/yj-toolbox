@@ -1,16 +1,18 @@
 const app = getApp();
 const db = wx.cloud.database();
+const privacy = require('../../utils/privacy');
 
 Page({
   data: {
     isEditing: false,
     isAdmin: false,
     userId: null, // 云数据库中用户记录的 _id
+    showPrivacyModal: true, // 默认显示隐私弹窗
+    privacyPurposes: [], // 隐私授权用途列表
     formData: {
       avatar: '',
       name: '用户昵称',
       gender: '男',
-      birthday: '',
       realName: '',
       phone: '',
       carNumber: '',
@@ -27,6 +29,18 @@ Page({
   },
 
   async onLoad(options) {
+    // 加载隐私用途说明
+    const purposes = privacy.getAllPurposes();
+    this.setData({ privacyPurposes: purposes });
+    // 保存 options 供同意后使用
+    this._pageOptions = options;
+    // 检查隐私授权
+    if (privacy.hasAgreed()) {
+      this.setData({ showPrivacyModal: false });
+    } else {
+      this.setData({ showPrivacyModal: true });
+      return; // 未同意不加载数据
+    }
     // 先从缓存加载，避免闪烁
     const cached = wx.getStorageSync('userInfo');
     if (cached) {
@@ -109,8 +123,51 @@ Page({
     });
   },
 
+  // 隐私授权 - 同意
+  onPrivacyAgree() {
+    privacy.setAgreed();
+    this.setData({ showPrivacyModal: false });
+    // 同意后继续加载数据（同 onLoad 逻辑）
+    const options = this._pageOptions || {};
+    // 先从缓存加载
+    const cached = wx.getStorageSync('userInfo');
+    if (cached) {
+      this.setData({ userId: cached.userId, formData: { ...this.data.formData, ...cached.formData } });
+    }
+    this.loadUserInfo();
+    // 检查管理员身份
+    this.getOpenid().then(openid => {
+      if (!openid) return;
+      const cached = app.getAdminCache(openid);
+      if (cached) {
+        this.setData({ isAdmin: cached.isAdmin });
+      }
+    });
+    // 如果有 edit=1 参数，进入编辑状态
+    if (options.edit === '1') {
+      this.setData({ isEditing: true });
+    }
+  },
+
+  // 隐私授权 - 不同意
+  onPrivacyDisagree() {
+    wx.showModal({
+      title: '提示',
+      content: '您需要同意隐私授权才能使用个人信息管理功能',
+      showCancel: false,
+      success: () => {
+        wx.navigateBack();
+      }
+    });
+  },
+
   // 保存数据
   async onSave() {
+    // 再次检查隐私授权
+    if (!privacy.hasAgreed()) {
+      this.setData({ showPrivacyModal: true });
+      return;
+    }
     // 如果当前是预览模式，切换到编辑模式
     if (!this.data.isEditing) {
       this.setData({ isEditing: true });
@@ -162,13 +219,6 @@ Page({
     const gender = e.currentTarget.dataset.gender;
     this.setData({
       'formData.gender': gender
-    });
-  },
-
-  // 选择生日
-  onBirthdayChange(e) {
-    this.setData({
-      'formData.birthday': e.detail.value
     });
   },
 

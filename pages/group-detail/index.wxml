@@ -201,6 +201,31 @@
   <!-- 报名弹窗 -->
   <view wx:if="{{showSignUpModal}}" class="modal-mask" catchtap="onCloseSignUp" catchtouchmove="stopPropagation">
     <view class="modal-content modal-scroll" catchtap="stopPropagation">
+
+      <!-- 隐私授权弹窗（盖在报名表上） -->
+      <view wx:if="{{showPrivacyModal}}" class="inner-privacy-mask">
+        <view class="inner-privacy-modal">
+          <view class="privacy-header">
+            <text class="privacy-title">个人信息使用授权</text>
+            <text class="privacy-subtitle">保存预设信息将收集以下数据，请确认用途：</text>
+          </view>
+          <scroll-view class="privacy-body" scroll-y>
+            <view class="privacy-item" wx:for="{{privacyPurposes}}" wx:for-item="p" wx:key="key">
+              <view class="privacy-item-header">
+                <text class="privacy-label">{{p.label}}</text>
+              </view>
+              <text class="privacy-purpose">用途：{{p.purpose}}</text>
+            </view>
+            <view class="privacy-note">
+              <text class="privacy-note-text">我们承诺您的信息仅用于上述服务场景，不会用于其他任何用途。</text>
+            </view>
+          </scroll-view>
+          <view class="privacy-footer">
+            <view class="privacy-btn privacy-btn-disagree" bindtap="onPrivacyDisagree">不同意</view>
+            <view class="privacy-btn privacy-btn-agree" bindtap="onPrivacyAgree">同意并保存</view>
+          </view>
+        </view>
+      </view>
       <view class="modal-header">
         <text class="modal-title">{{mySignUpId ? '编辑报名信息' : '填写报名信息'}}</text>
         <view class="modal-close" bindtap="onCloseSignUp"><text>✕</text></view>

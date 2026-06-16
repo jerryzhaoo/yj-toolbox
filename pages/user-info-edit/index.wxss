@@ -5,6 +5,121 @@
   padding-bottom: 40rpx;
 }
 
+/* ===== 隐私授权弹窗 ===== */
+.privacy-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.privacy-modal {
+  width: 88%;
+  max-height: 78vh;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 28rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.privacy-header {
+  padding: 28rpx 32rpx 16rpx;
+  text-align: center;
+  flex-shrink: 0;
+}
+.privacy-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #111827;
+  display: block;
+  margin-bottom: 10rpx;
+}
+.privacy-subtitle {
+  font-size: 22rpx;
+  color: #6B7280;
+  display: block;
+  line-height: 1.4;
+}
+.privacy-body {
+  flex: 1;
+  padding: 8rpx 0;
+  max-height: 680rpx;
+}
+.privacy-item {
+  padding: 14rpx 32rpx 14rpx 48rpx;
+  border-bottom: 1rpx solid #F9FAFB;
+}
+.privacy-item:last-child {
+  border-bottom: none;
+}
+.privacy-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+.privacy-icon {
+  font-size: 26rpx;
+  flex-shrink: 0;
+}
+.privacy-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1F2937;
+}
+.privacy-purpose {
+  font-size: 22rpx;
+  color: #6B7280;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
+}
+.privacy-note {
+  margin: 12rpx 32rpx 12rpx 48rpx;
+  padding: 16rpx 20rpx;
+  background: #FFF7ED;
+  border-radius: 12rpx;
+}
+.privacy-note-text {
+  font-size: 20rpx;
+  color: #9A3412;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
+}
+.privacy-footer {
+  display: flex;
+  padding: 20rpx 32rpx 28rpx;
+  gap: 24rpx;
+  flex-shrink: 0;
+}
+.privacy-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.privacy-btn-disagree {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+.privacy-btn-agree {
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
+}
+
 /* 头部导航 */
 .header {
   position: sticky;
@@ -203,17 +318,6 @@
   border-color: #3B82F6;
 }
 
-/* 生日选择器 */
-.birthday-picker {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-}
-
-.birthday-picker .arrow {
-  color: #D1D5DB;
-  font-size: 28rpx;
-}
 
 /* 详细信息卡片 */
 .detail-card {

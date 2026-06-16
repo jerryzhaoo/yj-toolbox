@@ -1540,3 +1540,112 @@
   display: block;
   padding: 20rpx 0;
 }
+
+/* ===== 内嵌隐私授权弹窗（报名表内） ===== */
+.inner-privacy-mask {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24rpx;
+}
+.inner-privacy-modal {
+  width: 92%;
+  max-height: 85%;
+  background: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.inner-privacy-modal .privacy-header {
+  padding: 36rpx 28rpx 20rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+.inner-privacy-modal .privacy-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #111827;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.inner-privacy-modal .privacy-subtitle {
+  font-size: 24rpx;
+  color: #6B7280;
+  display: block;
+  line-height: 1.6;
+}
+.inner-privacy-modal .privacy-body {
+  flex: 1;
+  padding: 16rpx 28rpx;
+  max-height: 500rpx;
+}
+.inner-privacy-modal .privacy-item {
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #F9FAFB;
+}
+.inner-privacy-modal .privacy-item:last-child {
+  border-bottom: none;
+}
+.inner-privacy-modal .privacy-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+.inner-privacy-modal .privacy-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1F2937;
+}
+.inner-privacy-modal .privacy-purpose {
+  font-size: 22rpx;
+  color: #6B7280;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+.inner-privacy-modal .privacy-note {
+  margin-top: 12rpx;
+  padding: 16rpx;
+  background: #FFF7ED;
+  border-radius: 12rpx;
+}
+.inner-privacy-modal .privacy-note-text {
+  font-size: 20rpx;
+  color: #9A3412;
+  line-height: 1.5;
+  display: block;
+}
+.inner-privacy-modal .privacy-footer {
+  display: flex;
+  padding: 16rpx 28rpx 24rpx;
+  gap: 16rpx;
+  border-top: 1rpx solid #F3F4F6;
+  flex-shrink: 0;
+}
+.inner-privacy-modal .privacy-btn {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.inner-privacy-modal .privacy-btn-disagree {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+.inner-privacy-modal .privacy-btn-agree {
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
+}

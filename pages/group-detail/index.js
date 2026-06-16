@@ -1,6 +1,7 @@
 const app = getApp();
 const db = wx.cloud.database();
 const _ = db.command;
+const privacy = require('../../utils/privacy');
 
 Page({
   data: {
@@ -41,6 +42,9 @@ Page({
     displayBankCardNumber: '',
     displayBankName: '',
     focusedField: '',
+    showPrivacyModal: false,
+    privacyPurposes: [],
+    pendingSave: null, // 保存回调，同意后执行
   },
 
   async onLoad(options) {
@@ -349,7 +353,38 @@ Page({
     }
   },
 
+  // 隐私授权 - 同意
+  onPrivacyAgree() {
+    privacy.setAgreed();
+    this.setData({ showPrivacyModal: false });
+    const pending = this.data.pendingSave;
+    if (pending) {
+      this.setData({ pendingSave: null });
+      pending(); // 执行待保存操作
+    }
+  },
+
+  // 隐私授权 - 不同意
+  onPrivacyDisagree() {
+    this.setData({ showPrivacyModal: false, pendingSave: null });
+    wx.showToast({ title: '已取消保存', icon: 'none' });
+  },
+
   async onSaveInvoiceToPreset() {
+    // 检查隐私授权
+    if (!privacy.hasAgreed()) {
+      const purposes = privacy.getPurposesByKeys(['realName', 'phone', 'carNumber', 'invoice']);
+      this.setData({
+        privacyPurposes: purposes,
+        showPrivacyModal: true,
+        pendingSave: () => this._doSaveInvoiceToPreset(),
+      });
+      return;
+    }
+    await this._doSaveInvoiceToPreset();
+  },
+
+  async _doSaveInvoiceToPreset() {
     const { name, phone, carNumber, needInvoice, companyName, invoiceType, taxNumber, email } = this.data.signForm;
     wx.showLoading({ title: '保存中...' });
     try {

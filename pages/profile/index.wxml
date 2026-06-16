@@ -86,7 +86,7 @@
           </view>
           <view class="menu-text-wrap">
             <text class="menu-title">活动口令激活</text>
-            <text class="menu-subtitle">输入邀请码激活管理员</text>
+            <text class="menu-subtitle">输入邀请码激活服务</text>
           </view>
         </view>
         <text class="menu-arrow">›</text>

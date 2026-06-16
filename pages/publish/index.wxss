@@ -167,6 +167,114 @@
   box-sizing: border-box;
 }
 
+/* ===== 隐私授权弹窗（发布页） ===== */
+.publish-privacy-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+}
+.publish-privacy-modal {
+  width: 100%;
+  max-height: 70vh;
+  background: #ffffff;
+  border-radius: 28rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.publish-privacy-modal .pp-header {
+  padding: 36rpx 32rpx 20rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+.publish-privacy-modal .pp-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #111827;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.publish-privacy-modal .pp-subtitle {
+  font-size: 24rpx;
+  color: #6B7280;
+  display: block;
+  line-height: 1.6;
+}
+.publish-privacy-modal .pp-body {
+  flex: 1;
+  padding: 16rpx 32rpx;
+  max-height: 500rpx;
+}
+.publish-privacy-modal .pp-item {
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #F9FAFB;
+}
+.publish-privacy-modal .pp-item:last-child {
+  border-bottom: none;
+}
+.publish-privacy-modal .pp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+.publish-privacy-modal .pp-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1F2937;
+}
+.publish-privacy-modal .pp-purpose {
+  font-size: 22rpx;
+  color: #6B7280;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+.publish-privacy-modal .pp-note {
+  margin-top: 12rpx;
+  padding: 14rpx;
+  background: #FFF7ED;
+  border-radius: 12rpx;
+}
+.publish-privacy-modal .pp-note-text {
+  font-size: 20rpx;
+  color: #9A3412;
+  line-height: 1.5;
+  display: block;
+}
+.publish-privacy-modal .pp-footer {
+  display: flex;
+  padding: 16rpx 32rpx 24rpx;
+  gap: 16rpx;
+  border-top: 1rpx solid #F3F4F6;
+  flex-shrink: 0;
+}
+.publish-privacy-modal .pp-btn {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.publish-privacy-modal .pp-btn-disagree {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+.publish-privacy-modal .pp-btn-agree {
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
+}
+
 .placeholder {
   color: #9CA3AF;
 }
@@ -182,6 +290,114 @@
   border-radius: 10rpx;
   padding: 16rpx;
   box-sizing: border-box;
+}
+
+/* ===== 隐私授权弹窗（发布页） ===== */
+.publish-privacy-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+}
+.publish-privacy-modal {
+  width: 100%;
+  max-height: 70vh;
+  background: #ffffff;
+  border-radius: 28rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.publish-privacy-modal .pp-header {
+  padding: 36rpx 32rpx 20rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+.publish-privacy-modal .pp-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #111827;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.publish-privacy-modal .pp-subtitle {
+  font-size: 24rpx;
+  color: #6B7280;
+  display: block;
+  line-height: 1.6;
+}
+.publish-privacy-modal .pp-body {
+  flex: 1;
+  padding: 16rpx 32rpx;
+  max-height: 500rpx;
+}
+.publish-privacy-modal .pp-item {
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #F9FAFB;
+}
+.publish-privacy-modal .pp-item:last-child {
+  border-bottom: none;
+}
+.publish-privacy-modal .pp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+.publish-privacy-modal .pp-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1F2937;
+}
+.publish-privacy-modal .pp-purpose {
+  font-size: 22rpx;
+  color: #6B7280;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+.publish-privacy-modal .pp-note {
+  margin-top: 12rpx;
+  padding: 14rpx;
+  background: #FFF7ED;
+  border-radius: 12rpx;
+}
+.publish-privacy-modal .pp-note-text {
+  font-size: 20rpx;
+  color: #9A3412;
+  line-height: 1.5;
+  display: block;
+}
+.publish-privacy-modal .pp-footer {
+  display: flex;
+  padding: 16rpx 32rpx 24rpx;
+  gap: 16rpx;
+  border-top: 1rpx solid #F3F4F6;
+  flex-shrink: 0;
+}
+.publish-privacy-modal .pp-btn {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.publish-privacy-modal .pp-btn-disagree {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+.publish-privacy-modal .pp-btn-agree {
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
 }
 
 .location-icon {
@@ -304,6 +520,114 @@
   border-radius: 10rpx;
   padding: 10rpx 14rpx;
   box-sizing: border-box;
+}
+
+/* ===== 隐私授权弹窗（发布页） ===== */
+.publish-privacy-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+}
+.publish-privacy-modal {
+  width: 100%;
+  max-height: 70vh;
+  background: #ffffff;
+  border-radius: 28rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.publish-privacy-modal .pp-header {
+  padding: 36rpx 32rpx 20rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+.publish-privacy-modal .pp-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #111827;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.publish-privacy-modal .pp-subtitle {
+  font-size: 24rpx;
+  color: #6B7280;
+  display: block;
+  line-height: 1.6;
+}
+.publish-privacy-modal .pp-body {
+  flex: 1;
+  padding: 16rpx 32rpx;
+  max-height: 500rpx;
+}
+.publish-privacy-modal .pp-item {
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #F9FAFB;
+}
+.publish-privacy-modal .pp-item:last-child {
+  border-bottom: none;
+}
+.publish-privacy-modal .pp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+.publish-privacy-modal .pp-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1F2937;
+}
+.publish-privacy-modal .pp-purpose {
+  font-size: 22rpx;
+  color: #6B7280;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+.publish-privacy-modal .pp-note {
+  margin-top: 12rpx;
+  padding: 14rpx;
+  background: #FFF7ED;
+  border-radius: 12rpx;
+}
+.publish-privacy-modal .pp-note-text {
+  font-size: 20rpx;
+  color: #9A3412;
+  line-height: 1.5;
+  display: block;
+}
+.publish-privacy-modal .pp-footer {
+  display: flex;
+  padding: 16rpx 32rpx 24rpx;
+  gap: 16rpx;
+  border-top: 1rpx solid #F3F4F6;
+  flex-shrink: 0;
+}
+.publish-privacy-modal .pp-btn {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.publish-privacy-modal .pp-btn-disagree {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+.publish-privacy-modal .pp-btn-agree {
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
 }
 
 .form-row {
@@ -604,4 +928,220 @@
   border-radius: 8rpx;
   padding: 0 14rpx;
   box-sizing: border-box;
+}
+
+/* ===== 隐私授权弹窗（发布页） ===== */
+.publish-privacy-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+}
+.publish-privacy-modal {
+  width: 100%;
+  max-height: 70vh;
+  background: #ffffff;
+  border-radius: 28rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.publish-privacy-modal .pp-header {
+  padding: 36rpx 32rpx 20rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+.publish-privacy-modal .pp-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #111827;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.publish-privacy-modal .pp-subtitle {
+  font-size: 24rpx;
+  color: #6B7280;
+  display: block;
+  line-height: 1.6;
+}
+.publish-privacy-modal .pp-body {
+  flex: 1;
+  padding: 16rpx 32rpx;
+  max-height: 500rpx;
+}
+.publish-privacy-modal .pp-item {
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #F9FAFB;
+}
+.publish-privacy-modal .pp-item:last-child {
+  border-bottom: none;
+}
+.publish-privacy-modal .pp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+.publish-privacy-modal .pp-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1F2937;
+}
+.publish-privacy-modal .pp-purpose {
+  font-size: 22rpx;
+  color: #6B7280;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+.publish-privacy-modal .pp-note {
+  margin-top: 12rpx;
+  padding: 14rpx;
+  background: #FFF7ED;
+  border-radius: 12rpx;
+}
+.publish-privacy-modal .pp-note-text {
+  font-size: 20rpx;
+  color: #9A3412;
+  line-height: 1.5;
+  display: block;
+}
+.publish-privacy-modal .pp-footer {
+  display: flex;
+  padding: 16rpx 32rpx 24rpx;
+  gap: 16rpx;
+  border-top: 1rpx solid #F3F4F6;
+  flex-shrink: 0;
+}
+.publish-privacy-modal .pp-btn {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.publish-privacy-modal .pp-btn-disagree {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+.publish-privacy-modal .pp-btn-agree {
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
+}
+
+/* ===== 隐私授权弹窗（发布页） ===== */
+.publish-privacy-mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 40rpx;
+}
+.publish-privacy-modal {
+  width: 100%;
+  max-height: 70vh;
+  background: #ffffff;
+  border-radius: 28rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.publish-privacy-modal .pp-header {
+  padding: 36rpx 32rpx 20rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #F3F4F6;
+}
+.publish-privacy-modal .pp-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #111827;
+  display: block;
+  margin-bottom: 12rpx;
+}
+.publish-privacy-modal .pp-subtitle {
+  font-size: 24rpx;
+  color: #6B7280;
+  display: block;
+  line-height: 1.6;
+}
+.publish-privacy-modal .pp-body {
+  flex: 1;
+  padding: 16rpx 32rpx;
+  max-height: 500rpx;
+}
+.publish-privacy-modal .pp-item {
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #F9FAFB;
+}
+.publish-privacy-modal .pp-item:last-child {
+  border-bottom: none;
+}
+.publish-privacy-modal .pp-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+.publish-privacy-modal .pp-label {
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #1F2937;
+}
+.publish-privacy-modal .pp-purpose {
+  font-size: 22rpx;
+  color: #6B7280;
+  line-height: 1.5;
+  display: block;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+.publish-privacy-modal .pp-note {
+  margin-top: 12rpx;
+  padding: 14rpx;
+  background: #FFF7ED;
+  border-radius: 12rpx;
+}
+.publish-privacy-modal .pp-note-text {
+  font-size: 20rpx;
+  color: #9A3412;
+  line-height: 1.5;
+  display: block;
+}
+.publish-privacy-modal .pp-footer {
+  display: flex;
+  padding: 16rpx 32rpx 24rpx;
+  gap: 16rpx;
+  border-top: 1rpx solid #F3F4F6;
+  flex-shrink: 0;
+}
+.publish-privacy-modal .pp-btn {
+  flex: 1;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+.publish-privacy-modal .pp-btn-disagree {
+  background: #F3F4F6;
+  color: #6B7280;
+}
+.publish-privacy-modal .pp-btn-agree {
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: #ffffff;
+  box-shadow: 0 4rpx 12rpx rgba(59, 130, 246, 0.3);
 }
