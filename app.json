@@ -9,8 +9,7 @@
     "pages/user-info-edit/index",
     "pages/init-data/index",
     "pages/banner-detail/index",
-    "pages/help/index",
-    "pages/community/index"
+    "pages/help/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",
@@ -40,6 +39,6 @@
       "desc": "你的位置信息将用于查找附近的停车场"
     }
   },
-  "requiredPrivateInfos": [],
+  "requiredPrivateInfos": ["chooseLocation"],
   "cloud": true
 }

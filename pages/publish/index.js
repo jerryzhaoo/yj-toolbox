@@ -647,6 +647,30 @@ Page({
         formData.creatorNickname = creatorName;
       }
 
+      // 内容安全检测
+      const secText = [formData.title, formData.description, formData.tips].filter(Boolean).join('\n');
+      if (secText) {
+        try {
+          const secRes = await wx.cloud.callFunction({
+            name: 'securityCheck',
+            data: { type: 'text', content: secText },
+          });
+          console.log('[安全检测] 返回结果:', JSON.stringify(secRes.result));
+          if (secRes.result && (secRes.result.errcode === 87014 || secRes.result.errCode === 87014)) {
+            wx.showToast({ title: '发布内容包含违规信息，请修改', icon: 'none' });
+            this.setData({ isSubmitting: false });
+            return;
+          }
+          if (secRes.result && secRes.result.errcode !== 0) {
+            wx.showToast({ title: '安全检测异常(' + secRes.result.errcode + ')，请重试', icon: 'none' });
+            this.setData({ isSubmitting: false });
+            return;
+          }
+        } catch (e) {
+          console.warn('[安全检测] 文本检测异常:', e);
+        }
+      }
+
       if (this.data.isEditing && this.data.editId) {
         // 编辑模式：走云函数（兼容管理员编辑他人活动）
         const { _id, _openid, createdAt, updatedAt, ...cleanFormData } = formData;

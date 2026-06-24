@@ -169,6 +169,8 @@
   font-size: 26rpx;
   color: #4B5563;
   line-height: 1.7;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .validity-row {

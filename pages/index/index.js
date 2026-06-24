@@ -513,10 +513,7 @@ Page({
 
   // ====== 发布 & 导航 ======
   onPublishClick() {
-    if (!this.data.isAdmin) {
-      wx.showToast({ title: '仅管理员可发布', icon: 'none' });
-      return;
-    }
+    if (!this.data.isAdmin) return;
     wx.navigateTo({ url: '/pages/publish/index' });
   },
 

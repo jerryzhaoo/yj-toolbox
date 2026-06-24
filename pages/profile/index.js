@@ -134,127 +134,24 @@ Page({
   onMyJoined() { wx.navigateTo({ url: '/pages/my-posts/index?type=joined&title=我参与的' }); },
   onHelp() { wx.navigateTo({ url: '/pages/help/index' }); },
 
-  // ====== 社群信息弹窗 ======
-  async onCommunity() {
-    wx.showLoading({ title: '加载中...' });
-    await this.loadCommunityData();
-    wx.hideLoading();
-    this.setData({ showCommunityModal: true, commIndex: 0 });
-  },
-
-  async loadCommunityData(forceRefresh = false) {
-    // 非强制刷新时读缓存
-    if (!forceRefresh) {
-      const cached = cache.get('communities')
-      if (cached) {
-        this.setData({ commGroups: cached })
-        return
-      }
-    }
-    try {
-      let groups = [];
-      try {
-        const res = await db.collection('communities').orderBy('order', 'desc').get();
-        groups = res.data || [];
-      } catch (e) {
-        if (e.errCode !== -502005) throw e;
-      }
-      // 转换云文件ID为临时URL
-      const fileIds = groups.map(g => g.imageUrl).filter(Boolean);
-      if (fileIds.length > 0) {
-        try {
-          const { result } = await wx.cloud.callFunction({ name: 'getTempFileUrls', data: { fileList: fileIds } });
-          const urlMap = {};
-          for (const f of (result && result.fileList) || []) {
-            if (f.tempFileURL) urlMap[f.fileID] = f.tempFileURL;
-          }
-          groups = groups.map(g => ({ ...g, _imageUrl: urlMap[g.imageUrl] || g.imageUrl }));
-        } catch (e) {
-          console.error('[社群] 获取临时URL失败:', e);
-        }
-      }
-      this.setData({ commGroups: groups });
-      // 写入缓存（5分钟有效）
-      cache.set('communities', groups, 5 * 60 * 1000);
-    } catch (err) {
-      console.error('[社群] 加载失败:', err);
-      this.setData({ commGroups: [] });
-    }
-  },
-
-  onCloseCommunity() { this.setData({ showCommunityModal: false, commEditing: false, commEditGroups: [] }); },
-  onCommSwitch(e) { this.setData({ commIndex: Number(e.currentTarget.dataset.index) }); },
-  onCommSwiper(e) { this.setData({ commIndex: e.detail.current }); },
-  onCommPrev() { if (this.data.commIndex > 0) this.setData({ commIndex: this.data.commIndex - 1 }); },
-  onCommNext() { if (this.data.commIndex < this.data.commGroups.length - 1) this.setData({ commIndex: this.data.commIndex + 1 }); },
-  onCommCopy(e) {
-    const name = e.currentTarget.dataset.name;
-    if (name) wx.setClipboardData({ data: name, success: () => wx.showToast({ title: '已复制', icon: 'success' }) });
-  },
-
-  // 编辑社群
-  onCommStartEdit() {
-    this.setData({
-      commEditing: true,
-      commEditGroups: this.data.commGroups.length > 0
-        ? this.data.commGroups.map(g => ({ imageUrl: g.imageUrl, _imageUrl: g._imageUrl, description: g.description || '', isFull: !!g.isFull }))
-        : [{ imageUrl: '', description: '', isFull: false }],
-    });
-  },
-  onCommEditInput(e) {
-    const { index, field } = e.currentTarget.dataset;
-    this.setData({ [`commEditGroups[${index}].${field}`]: e.detail.value });
-  },
-  onCommEditToggleFull(e) {
-    this.setData({ [`commEditGroups[${e.currentTarget.dataset.index}].isFull`]: e.detail.value });
-  },
-  onCommEditAdd() {
-    this.setData({ commEditGroups: [...this.data.commEditGroups, { imageUrl: '', description: '', isFull: false }] });
-  },
-  onCommEditDel(e) {
-    const i = e.currentTarget.dataset.index;
-    this.setData({ commEditGroups: this.data.commEditGroups.filter((_, idx) => idx !== i) });
-  },
-  async onCommEditUpload(e) {
-    const i = e.currentTarget.dataset.index;
-    try {
-      const res = await wx.chooseImage({ count: 1, sizeType: ['compressed'], sourceType: ['album', 'camera'] });
-      wx.showLoading({ title: '上传中...' });
-      const cloudRes = await wx.cloud.uploadFile({
-        cloudPath: `community/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`,
-        filePath: res.tempFilePaths[0],
-      });
-      wx.hideLoading();
-      this.setData({ [`commEditGroups[${i}].imageUrl`]: cloudRes.fileID });
-    } catch (err) {
-      wx.hideLoading();
-      wx.showToast({ title: '上传失败', icon: 'error' });
-    }
-  },
-  onCommEditRemoveQr(e) { this.setData({ [`commEditGroups[${e.currentTarget.dataset.index}].imageUrl`]: '' }); },
-  onCommEditCancel() { this.setData({ commEditing: false, commEditGroups: [] }); },
-  async onCommEditSave() {
-    const { commEditGroups } = this.data;
-    const valid = commEditGroups.filter(g => g.imageUrl || g.description.trim());
-    if (valid.length === 0) { wx.showToast({ title: '请至少添加一个群', icon: 'none' }); return; }
-    wx.showLoading({ title: '保存中...' });
-    try {
-      const { result } = await wx.cloud.callFunction({
-        name: 'saveCommunity',
-        data: { groups: valid.map(g => ({ imageUrl: g.imageUrl || '', description: g.description.trim(), isFull: !!g.isFull })) },
-      });
-      wx.hideLoading();
-      if (!result || !result.success) { wx.showToast({ title: result?.msg || '保存失败', icon: 'error' }); return; }
-      wx.showToast({ title: '保存成功', icon: 'success' });
-      this.setData({ commEditing: false, commEditGroups: [] });
-      cache.remove('communities'); // 清除缓存，下次加载从库取
-      await this.loadCommunityData(true);
-    } catch (err) {
-      wx.hideLoading();
-      console.error('保存社群信息失败:', err);
-      wx.showToast({ title: '保存失败', icon: 'error' });
-    }
-  },
+  // ====== 社群信息弹窗（审核期间隐藏） ======
+  async onCommunity() { return; },
+  async loadCommunityData(forceRefresh = false) { return; },
+  onCloseCommunity() { return; },
+  onCommSwitch(e) { return; },
+  onCommSwiper(e) { return; },
+  onCommPrev() { return; },
+  onCommNext() { return; },
+  onCommCopy(e) { return; },
+  onCommStartEdit() { return; },
+  onCommEditInput(e) { return; },
+  onCommEditToggleFull(e) { return; },
+  onCommEditAdd() { return; },
+  onCommEditDel(e) { return; },
+  async onCommEditUpload(e) { return; },
+  onCommEditRemoveQr(e) { return; },
+  onCommEditCancel() { return; },
+  async onCommEditSave() { return; },
 
   // 预览头像
   onPreviewAvatar() {

@@ -248,17 +248,11 @@
   background: #ffffff;
 }
 
-/* 分类标签栏 - 吸顶效果 */
+/* 分类标签栏 */
 .tabs-container {
   padding: 0 32rpx;
   margin-bottom: 24rpx;
   background: transparent;
-  position: sticky;
-  top: 0;
-  z-index: 99;
-  left: 0;
-  right: 0;
-  width: 100%;
   box-sizing: border-box;
 }
 
@@ -1478,6 +1472,16 @@
   margin-top: -32rpx;
 }
 
+/* 普通用户 - 装饰圆点，不像按钮 */
+.tab-center-deco {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: #E5E7EB;
+  margin-top: 0;
+  pointer-events: none;
+}
+
 .center-btn {
   width: 96rpx;
   height: 96rpx;
@@ -1520,7 +1524,11 @@
 }
 
 /* 点击反馈 */
-.tab-item:active, .tab-center:active {
+.tab-item:active {
+  opacity: 0.7;
+}
+/* 仅管理员发布按钮有点击反馈 */
+.tab-center:not(.tab-center-deco):active {
   opacity: 0.7;
 }
 

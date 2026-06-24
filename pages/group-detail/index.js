@@ -1024,17 +1024,17 @@ Page({
       ctx.setTextBaseline('bottom');
       ctx.fillText(`⏱ 截止 ${vUntil} · 点击立即加入`, 20, canvasH - 14);
 
-      ctx.draw(false, () => {});
-      await new Promise(r => setTimeout(r, 300));
-
+      // 在 draw 回调中导出，确保 canvas 已渲染完成
       return new Promise((resolve) => {
-        wx.canvasToTempFilePath({
-          canvasId: 'shareCardCanvas',
-          x: 0, y: 0, width: canvasW, height: canvasH,
-          destWidth: canvasW * dpr, destHeight: canvasH * dpr,
-          fileType: 'jpg', quality: 0.9,
-          success: res => resolve(res.tempFilePath),
-          fail: err => { console.error('生成分享图失败:', err); resolve(''); }
+        ctx.draw(false, () => {
+          wx.canvasToTempFilePath({
+            canvasId: 'shareCardCanvas',
+            x: 0, y: 0, width: canvasW, height: canvasH,
+            destWidth: canvasW * dpr, destHeight: canvasH * dpr,
+            fileType: 'jpg', quality: 0.9,
+            success: res => resolve(res.tempFilePath),
+            fail: err => { console.error('生成分享图失败:', err); resolve(''); }
+          });
         });
       });
     } catch (err) {

@@ -66,18 +66,7 @@
 
     <!-- 第二组 -->
     <view class="menu-card">
-      <view class="menu-item" bindtap="onCommunity">
-        <view class="menu-left">
-          <view class="menu-icon pink-bg">
-            <image class="menu-svg" src="/assets/icons/heart.svg" mode="aspectFit" />
-          </view>
-          <view class="menu-text-wrap">
-            <text class="menu-title">社群信息</text>
-            <text class="menu-subtitle">获取最新动态和交流</text>
-          </view>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
+      <!-- 社群信息已隐藏（审核要求） -->
       <view class="divider"></view>
       <view class="menu-item" bindtap="onShowCdkActivate">
         <view class="menu-left">
@@ -206,117 +195,9 @@
     </view>
   </view>
 
-  <!-- 社群信息弹窗 -->
+<!-- 社群信息弹窗（审核期间隐藏）
   <view wx:if="{{showCommunityModal}}" class="comm-modal-mask" catchtap="onCloseCommunity" catchtouchmove="stopPropagation">
     <view class="comm-modal" catchtap="stopPropagation">
-      <!-- 顶部 -->
-      <view class="comm-header">
-        <view>
-          <text class="comm-title">加入社群</text>
-          <text class="comm-subtitle">扫码进群，获取工具更新 & 交流</text>
-        </view>
-        <view class="comm-header-right">
-          <text wx:if="{{isAdmin && !commEditing}}" class="comm-edit" bindtap="onCommStartEdit">编辑</text>
-          <text class="comm-close" bindtap="onCloseCommunity">✕</text>
-        </view>
-      </view>
-
-      <!-- 编辑模式 -->
-      <block wx:if="{{commEditing}}">
-        <scroll-view class="comm-edit-body" scroll-y>
-          <view class="comm-edit-list">
-            <view class="comm-edit-item" wx:for="{{commEditGroups}}" wx:for-item="eg" wx:key="index">
-              <view class="comm-edit-h">
-                <text class="comm-edit-label">{{'群' + (index + 1)}}</text>
-                <view class="comm-edit-del" wx:if="{{commEditGroups.length > 1}}" bindtap="onCommEditDel" data-index="{{index}}">删除</view>
-              </view>
-              <view class="comm-edit-row">
-                <text class="comm-edit-l">名称</text>
-                <input class="comm-edit-inp" placeholder="如：一群" value="{{eg.description}}" data-index="{{index}}" data-field="description" bindinput="onCommEditInput" />
-              </view>
-              <view class="comm-edit-row">
-                <text class="comm-edit-l">二维码</text>
-                <view class="comm-edit-upload">
-                  <image class="comm-edit-thumb" src="{{eg._imageUrl || eg.imageUrl}}" mode="aspectFill" wx:if="{{eg.imageUrl}}" />
-                  <view class="comm-edit-upbtn" bindtap="onCommEditUpload" data-index="{{index}}">{{eg.imageUrl ? '更换' : '上传'}}</view>
-                  <view class="comm-edit-upbtn del" wx:if="{{eg.imageUrl}}" bindtap="onCommEditRemoveQr" data-index="{{index}}">删除</view>
-                </view>
-              </view>
-              <view class="comm-edit-row comm-edit-switch">
-                <text class="comm-edit-l">已满员</text>
-                <switch checked="{{eg.isFull}}" data-index="{{index}}" bindchange="onCommEditToggleFull" color="#EF4444" />
-              </view>
-            </view>
-          </view>
-          <view class="comm-edit-add" bindtap="onCommEditAdd">
-            <text>+ 添加新群</text>
-          </view>
-        </scroll-view>
-        <view class="comm-edit-ft">
-          <view class="comm-edit-cancel" bindtap="onCommEditCancel">取消</view>
-          <view class="comm-edit-save" bindtap="onCommEditSave">保存</view>
-        </view>
-      </block>
-
-      <!-- 浏览模式 -->
-      <block wx:else>
-        <view wx:if="{{commGroups.length === 0}}" class="comm-empty">
-          <text>暂无社群信息</text>
-          <text class="comm-empty-tip">点击右上角「编辑」添加</text>
-        </view>
-
-        <block wx:else>
-          <!-- Tab -->
-          <view wx:if="{{commGroups.length > 1}}" class="comm-tabs">
-            <view 
-              wx:for="{{commGroups}}" 
-              wx:for-item="g" 
-              wx:key="order"
-              class="comm-tab {{commIndex === index ? 'active' : ''}}"
-              bindtap="onCommSwitch" 
-              data-index="{{index}}"
-            >
-              <text>{{'群' + (index + 1)}}</text>
-            </view>
-          </view>
-
-          <!-- 群卡片 -->
-          <swiper class="comm-swiper" current="{{commIndex}}" bindchange="onCommSwiper">
-            <swiper-item wx:for="{{commGroups}}" wx:for-item="g" wx:key="order">
-              <view class="comm-card">
-                <view class="comm-qr-wrap {{g.isFull ? 'full' : ''}}">
-                  <image class="comm-qr" src="{{g._imageUrl || g.imageUrl}}" mode="aspectFit" show-menu-by-longpress wx:if="{{g.imageUrl}}" />
-                  <view wx:else class="comm-qr-empty"><text>📷 暂无二维码</text></view>
-                  <view class="comm-qr-mask" wx:if="{{g.isFull}}">
-                    <text class="qr-mask-icon">🔒</text>
-                    <text class="qr-mask-title">该群已满员</text>
-                    <text class="qr-mask-sub">请扫描下一群二维码</text>
-                  </view>
-                </view>
-                <view class="comm-name-row">
-                  <text class="comm-name">{{g.description || '群' + (index + 1)}}</text>
-                  <view class="comm-inline-tag {{g.isFull ? 'full' : 'open'}}">
-                    <text>{{g.isFull ? '已满员' : '招募中'}}</text>
-                  </view>
-                </view>
-                <text class="comm-status-text {{g.isFull ? 'full' : 'open'}}">{{g.isFull ? '已满员，暂不可加入' : '正在招募，快来加入！'}}</text>
-              </view>
-            </swiper-item>
-          </swiper>
-
-          <!-- 导航 -->
-          <view wx:if="{{commGroups.length > 1}}" class="comm-nav">
-            <view class="comm-nav-btn {{commIndex === 0 ? 'disabled' : ''}}" bindtap="onCommPrev">‹ 上一群</view>
-            <view class="comm-dots">
-              <view wx:for="{{commGroups}}" wx:key="order" class="comm-dot {{commIndex === index ? 'active' : ''}}" />
-            </view>
-            <view class="comm-nav-btn {{commIndex === commGroups.length - 1 ? 'disabled' : ''}}" bindtap="onCommNext">下一群 ›</view>
-          </view>
-        </block>
-
-        <view class="comm-footer">💡 二维码长期有效，若失效请联系管理员</view>
-      </block>
-    </view>
   </view>
 
   <!-- 底部导航栏 -->

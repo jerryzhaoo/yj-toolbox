@@ -250,6 +250,26 @@ Page({
       const fileID = cloudRes.fileID;
       this.setData({ 'formData.avatar': fileID });
 
+      // 内容安全检测
+      wx.showLoading({ title: '安全检测中...' });
+      const secRes = await wx.cloud.callFunction({
+        name: 'securityCheck',
+        data: { type: 'image', content: fileID },
+      });
+      const secCode = secRes.result && (secRes.result.errcode || secRes.result.errCode);
+      if (secCode === 87014) {
+        // 违规内容，删除已上传文件
+        await wx.cloud.deleteFile({ fileList: [fileID] }).catch(() => {});
+        wx.hideLoading();
+        wx.showToast({ title: '头像包含违规内容，请更换', icon: 'none' });
+        this.setData({ 'formData.avatar': '' });
+        return;
+      }
+      // 其他错误（网络超时等）不阻断流程，仅给出提示
+      if (secCode !== undefined && secCode !== 0 && secCode !== 87014) {
+        console.warn('[安全检测] 检测异常:', secRes.result);
+      }
+
       // 自动保存到云数据库
       const { userId } = this.data;
       if (userId) {
