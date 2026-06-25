@@ -78,7 +78,7 @@ Page({
   },
 
   types: ['group', 'transfer', 'secondhand', 'job'],
-  typeLabels: ['拼团活动', '月卡转让', '闲置二手', '招聘信息'],
+  typeLabels: ['报名活动', '月卡转让', '闲置二手', '招聘信息'],
 
   async onLoad(options) {
     const isAdmin = await this.checkAdmin();
@@ -331,7 +331,7 @@ Page({
     this.setData(update);
   },
 
-  // 一键填写转账信息（从预设加载）
+  // 一键填写集合信息（从预设加载）
   async onFillBankFromPreset() {
     try {
       const openidRes = await wx.cloud.callFunction({ name: 'getOpenid' });
@@ -347,7 +347,7 @@ Page({
         });
         wx.showToast({ title: '已填写', icon: 'success' });
       } else {
-        wx.showToast({ title: '暂无预设转账信息', icon: 'none' });
+        wx.showToast({ title: '暂无预设集合信息', icon: 'none' });
       }
     } catch (err) {
       console.error('加载预设转账信息失败:', err);
@@ -376,7 +376,7 @@ Page({
   async onSaveBankToPreset() {
     const { bankAccountName, bankCardNumber, bankName } = this.data.groupForm;
     if (!bankAccountName || !bankCardNumber || !bankName) {
-      wx.showToast({ title: '请先填写完整的转账信息', icon: 'none' });
+      wx.showToast({ title: '请先填写完整的集合信息', icon: 'none' });
       return;
     }
     // 检查隐私授权
@@ -578,15 +578,15 @@ Page({
         return;
       }
       if (!groupForm.targetMonths && groupForm.targetMonths !== 0) {
-        wx.showToast({ title: '请输入目标月数', icon: 'none' });
+        wx.showToast({ title: '请输入目标张数', icon: 'none' });
         return;
       }
       if (!groupForm.groupPrice && groupForm.groupPrice !== 0) {
-        wx.showToast({ title: '请输入拼团价', icon: 'none' });
+        wx.showToast({ title: '请输入自驾里程', icon: 'none' });
         return;
       }
       if (!groupForm.originalPrice && groupForm.originalPrice !== 0) {
-        wx.showToast({ title: '请输入原价', icon: 'none' });
+        wx.showToast({ title: '请输入原定里程', icon: 'none' });
         return;
       }
       if (!groupForm.description || groupForm.description.trim().length < 12) {
@@ -599,6 +599,12 @@ Page({
       }
       if (!groupForm.validUntil) {
         wx.showToast({ title: '请选择截止日期', icon: 'none' });
+        return;
+      }
+      // 截止日期 ≤ 今天 且 活动状态为"进行中"时，不允许保存
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (groupForm.validUntil <= todayStr && !groupForm.isClosed) {
+        wx.showToast({ title: '截止日期不能早于今天，请修改日期或将活动状态改为"已截止"', icon: 'none', duration: 2000 });
         return;
       }
     } else if (publishType === 'transfer') {
@@ -655,7 +661,6 @@ Page({
             name: 'securityCheck',
             data: { type: 'text', content: secText },
           });
-          console.log('[安全检测] 返回结果:', JSON.stringify(secRes.result));
           if (secRes.result && (secRes.result.errcode === 87014 || secRes.result.errCode === 87014)) {
             wx.showToast({ title: '发布内容包含违规信息，请修改', icon: 'none' });
             this.setData({ isSubmitting: false });

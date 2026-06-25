@@ -92,7 +92,7 @@
 
           </view>
 
-          <text class="header-title-text">拼团中</text>
+          <text class="header-title-text">报名中</text>
         </view>
 
       </view>
@@ -153,7 +153,7 @@
         <block wx:for="{{groupBuyingData}}" wx:key="_id">
           <view 
             id="card-{{item._id}}"
-            class="activity-card card"
+            class="activity-card card {{item.isExpired ? 'card-expired' : ''}}"
             data-activity="{{item}}"
             bindtap="onActivityClick"
             bindlongpress="onLongPressCard"
@@ -173,8 +173,8 @@
                 </view>
 
                 <view class="card-price-row" wx:if="{{item.groupPrice && item.originalPrice}}">
-                  <text class="card-group-price">¥{{item.groupPrice}}</text>
-                  <text class="card-original-price">¥{{item.originalPrice}}</text>
+                  <text class="card-group-price">自驾{{item.groupPrice}}km</text>
+                  <text class="card-original-price">原定{{item.originalPrice}}km</text>
                 </view>
 
               </view>
@@ -194,7 +194,7 @@
             <view class="card-info">
               <view class="info-top">
                 <view class="info-tags">
-                  <text class="tag {{item.isExpired ? 'tag-gray' : 'tag-yellow'}}">{{item.isExpired ? '已截止' : '拼月卡'}}</text>
+                  <text class="tag {{item.isExpired ? 'tag-gray' : 'tag-yellow'}}">{{item.isExpired ? '已截止' : '报名中'}}</text>
                   <text class="creator-name" wx:if="{{item.creatorNickname}}">{{item.creatorNickname}}</text>
                 </view>
 
@@ -203,7 +203,7 @@
 
               <view class="info-bottom">
                 <text class="people-count {{item.isExpired ? 'gray' : 'orange'}}">
-                  已报名<text class="count-num">{{item.currentMonths || 0}}</text><text wx:if="{{item.targetMonths}}">/{{item.targetMonths}}</text>个月
+                  已报名<text class="count-num">{{item.currentMonths || 0}}</text><text wx:if="{{item.targetMonths}}">/{{item.targetMonths}}</text>张
                 </text>
                 <view class="join-btn {{item.isExpired ? 'btn-disabled' : ''}}">
                   {{item.isExpired ? '已截止' : '报名上车'}}
@@ -225,7 +225,7 @@
       <view class="grid-container">
         <block wx:for="{{transferData}}" wx:key="_id">
           <view 
-            class="grid-card card"
+            class="grid-card card {{item.isExpired ? 'card-expired' : ''}}"
             data-item="{{item}}"
             bindtap="onGridCardClick"
           >
@@ -245,7 +245,7 @@
             <view class="grid-info">
               <text class="grid-title">{{item.title}}</text>
               <block wx:if="{{item.price}}">
-                <text class="grid-price">¥{{item.price}}</text>
+                <text class="grid-price">{{item.price}}km</text>
               </block>
               <text class="meta-item meta-location">◉ {{utils.formatRegion(item.region || item.location)}}</text>
               <text class="meta-item meta-time">⏱ {{item.validFrom ? item.validFrom + ' 至 ' : ''}}{{item.validUntil || ''}}</text>
@@ -263,7 +263,7 @@
       <view class="list-container">
         <block wx:for="{{transferData}}" wx:key="_id">
           <view 
-            class="list-card card"
+            class="list-card card {{item.isExpired ? 'card-expired' : ''}}"
             data-item="{{item}}"
             bindtap="onGridCardClick"
           >
@@ -286,7 +286,7 @@
               <text class="meta-item meta-location">◉ {{utils.formatRegion(item.region || item.location)}}</text>
               <text class="meta-item meta-time">⏱ {{item.validFrom ? item.validFrom + ' 至 ' : ''}}{{item.validUntil || ''}}</text>
               <block wx:if="{{item.price}}">
-                <text class="list-price">转让价 ¥{{item.price}}<text wx:if="{{item.originalPrice}}" class="list-original-price"> 原价 ¥{{item.originalPrice}}</text></text>
+                <text class="list-price">自驾 {{item.price}}km<text wx:if="{{item.originalPrice}}" class="list-original-price"> 原定 {{item.originalPrice}}km</text></text>
               </block>
             </view>
 

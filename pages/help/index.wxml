@@ -5,26 +5,26 @@
     <view class="card">
       <text class="card-title">⚡ 一键填写与预设信息</text>
       <view class="card-body">
-        <text class="card-text">每次报名都需要填写姓名、手机号、车牌号等信息，可以使用「一键填写」功能快速录入：</text>
+        <text class="card-text">每次报名都需要填写姓名、手机号等信息，可以使用「一键填写」功能快速录入：</text>
         <view class="step-list">
           <view class="step-item"><text class="step-num">1</text><text class="step-desc">在「我的 → 预设报名信息」中填写您的个人信息并保存</text></view>
-          <view class="step-item"><text class="step-num">2</text><text class="step-desc">参与拼团报名时，点击弹窗中的「一键填写」按钮，系统会自动填充已保存的信息</text></view>
+          <view class="step-item"><text class="step-num">2</text><text class="step-desc">参与活动报名时，点击弹窗中的「一键填写」按钮，系统会自动填充已保存的信息</text></view>
           <view class="step-item"><text class="step-num">3</text><text class="step-desc">报名表单中填写完毕后，也可点击「保存到预设信息」更新您的预设资料</text></view>
         </view>
-        <text class="card-text tip-text">💡 预设信息包括：姓名、手机号、车牌号、发票信息（公司名、税号、邮箱）</text>
+        <text class="card-text tip-text">💡 预设信息包括：姓名、手机号、发票信息（公司名、税号、邮箱）</text>
       </view>
     </view>
 
-    <!-- Part 2: 转账说明 -->
+    <!-- Part 2: 签到说明 -->
     <view class="card">
-      <text class="card-title">💳 转账说明</text>
+      <text class="card-title">✅ 签到说明</text>
       <view class="card-body">
-        <text class="card-text">拼团报名后需完成转账：</text>
+        <text class="card-text">活动报名后需完成签到：</text>
         <view class="bullet-list">
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">活动页面会显示收款人的银行卡信息（户名、卡号、开户行）</text></view>
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">转账完成后，必须回到活动页上传转账凭证截图，请对自己负责！</text></view>
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">如已转账但未及时上传凭证，则不会安排充值月卡，可联系群内管理7个工作日内安排退款</text></view>
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">⚠️ 请如实转账，如发现虚假凭证将被永久拉黑</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">活动页面会显示领队的集合信息（领队名字、领队ID、集合地点）</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">集合完毕后，需回到活动页上传签到凭证截图，完成签到确认</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">如报名后未签到，请及时联系领队处理</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">⚠️ 请如实签到，如发现虚假凭证将被永久拉黑</text></view>
         </view>
       </view>
     </view>
@@ -44,15 +44,15 @@
       </view>
     </view>
 
-    <!-- Part 4: 拼团进度 -->
+    <!-- Part 4: 报名进度 -->
     <view class="card">
-      <text class="card-title">📊 拼团进度说明</text>
+      <text class="card-title">📊 报名进度说明</text>
       <view class="card-body">
-        <text class="card-text">拼团活动页展示当前的拼团进度条：</text>
+        <text class="card-text">活动详情页展示当前的报名进度：</text>
         <view class="bullet-list">
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">进度 = 已报名总月数 ÷ 目标月数</text></view>
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">已达目标月数 → 拼团成功，进入转账环节</text></view>
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">有效期内未达目标 → 自动失效，无需额外操作</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">进度 = 已报名总张数 ÷ 目标张数</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">已达目标张数 → 活动成行，进入签到环节</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">有效期内未达目标 → 自动取消，无需额外操作</text></view>
         </view>
       </view>
     </view>
@@ -61,10 +61,9 @@
     <view class="card">
       <text class="card-title">📤 我发布的</text>
       <view class="card-body">
-        <text class="card-text">「我发布的」页面展示所有您发布的活动和转让信息：</text>
+        <text class="card-text">「我发布的」页面展示所有您发布的活动信息：</text>
         <view class="bullet-list">
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">拼团活动：您创建的拼团活动列表，可查看报名人数、管理参与者</text></view>
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">月卡转让：您发布的转让信息，可编辑或下架</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">自驾活动：您创建的自驾活动列表，可查看报名成员、管理参与者</text></view>
           <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">管理员可长按活动卡片进行复制或删除</text></view>
         </view>
       </view>
@@ -76,21 +75,20 @@
       <view class="card-body">
         <text class="card-text">「我参与的」页面汇总您报名过的所有活动：</text>
         <view class="bullet-list">
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">已报名的拼团活动，包括进行中和已截止的</text></view>
-          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">可查看自己的报名信息（姓名、车牌号、月数等）</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">已报名的自驾活动，包括进行中和已截止的</text></view>
+          <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">可查看自己的报名信息（姓名、车牌号、张数等）</text></view>
           <view class="bullet-item"><text class="bullet">•</text><text class="bullet-text">已报名的活动可在线「取消报名」</text></view>
         </view>
       </view>
     </view>
-
 
     <!-- Part 7: QA -->
     <view class="card">
       <text class="card-title">❓ 常见问题</text>
       <view class="card-body">
         <view class="qa-item">
-          <text class="qa-q">Q：可以同时报名多个拼团吗？</text>
-          <text class="qa-a">A：可以，每个拼团活动独立报名，互不影响。</text>
+          <text class="qa-q">Q：可以同时报名多个活动吗？</text>
+          <text class="qa-a">A：可以，每个活动独立报名，互不影响。</text>
         </view>
         <view class="qa-item">
           <text class="qa-q">Q：报名后可以修改信息吗？</text>
@@ -98,10 +96,10 @@
         </view>
         <view class="qa-item">
           <text class="qa-q">Q：如何取消报名？</text>
-          <text class="qa-a">A：在活动详情页点击「取消报名」即可退出。如活动已截止或已标记已转账，则无法取消。</text>
+          <text class="qa-a">A：在活动详情页点击「取消报名」即可退出。如活动已截止或已标记已签到，则无法取消。</text>
         </view>
         <view class="qa-item">
-          <text class="qa-q">Q：拼团失败了怎么办？</text>
+          <text class="qa-q">Q：活动未达成目标怎么办？</text>
           <text class="qa-a">A：无需任何操作，系统会自动标记活动为已失效，您的报名记录将被清除。</text>
         </view>
         <view class="qa-item">
@@ -109,7 +107,7 @@
           <text class="qa-a">A：联系现有超级管理员，使用管理员配置中的邀请码激活您的管理员账号。</text>
         </view>
         <view class="qa-item">
-          <text class="qa-q">Q：转账凭证上传错了怎么办？</text>
+          <text class="qa-q">Q：签到凭证上传错了怎么办？</text>
           <text class="qa-a">A：重新上传新的凭证即可覆盖原凭证。如已审核，请联系管理员处理。</text>
         </view>
       </view>

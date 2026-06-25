@@ -4,7 +4,7 @@
     <view class="publish-privacy-modal">
       <view class="pp-header">
         <text class="pp-title">个人信息使用授权</text>
-        <text class="pp-subtitle">保存预设转账信息将收集以下数据，请确认用途：</text>
+        <text class="pp-subtitle">保存预设集合信息将收集以下数据，请确认用途：</text>
       </view>
       <scroll-view class="pp-body" scroll-y>
         <view class="pp-item" wx:for="{{privacyPurposes}}" wx:for-item="p" wx:key="key">
@@ -51,7 +51,7 @@
           bindtap="onTypeChange"
           data-type="group"
         >
-          拼团活动
+          报名活动
         </view>
       </view>
     </scroll-view>
@@ -60,12 +60,12 @@
   <!-- 编辑模式下显示当前类型 -->
   <view wx:if="{{isEditing}}" class="type-tabs">
     <view class="current-type">
-      <text class="current-type-text">拼团活动</text>
+      <text class="current-type-text">报名活动</text>
     </view>
   </view>
 
   <view class="content">
-    <!-- 拼团活动表单 -->
+    <!-- 报名活动表单 -->
     <block wx:if="{{publishType === 'group'}}">
       <!-- 活动标题 -->
       <view class="form-card">
@@ -96,12 +96,12 @@
         </view>
       </view>
 
-      <!-- 拼团设置 -->
+      <!-- 报名设置 -->
       <view class="form-card">
-        <text class="form-title">拼团设置</text>
+        <text class="form-title">报名设置</text>
         <view class="form-row" style="margin-bottom: 16rpx;">
           <view class="form-group">
-            <text class="form-label-small"><text class="required">*</text>目标月数</text>
+            <text class="form-label-small"><text class="required">*</text>目标张数</text>
             <input 
               class="form-input" 
               type="number"
@@ -115,11 +115,11 @@
         </view>
         <view class="form-row">
           <view class="form-group">
-            <text class="form-label-small"><text class="required">*</text>拼团价（元/月）</text>
+            <text class="form-label-small"><text class="required">*</text>自驾里程（公里）</text>
             <input 
               class="form-input" 
               type="number"
-              placeholder="299"
+              placeholder="500"
               value="{{groupForm.groupPrice}}"
               data-field="groupPrice"
               data-type="group"
@@ -127,11 +127,11 @@
             />
           </view>
           <view class="form-group">
-            <text class="form-label-small"><text class="required">*</text>原价（元/月）</text>
+            <text class="form-label-small"><text class="required">*</text>原定里程（公里）</text>
             <input 
               class="form-input" 
               type="number"
-              placeholder="399"
+              placeholder="800"
               value="{{groupForm.originalPrice}}"
               data-field="originalPrice"
               data-type="group"
@@ -204,10 +204,10 @@
         </view>
       </view>
 
-      <!-- 转账信息 -->
+      <!-- 集合信息 -->
       <view class="form-card">
         <view class="section-title-row">
-          <text class="form-title">转账信息</text>
+          <text class="form-title">集合信息</text>
           <view class="section-actions">
             <view class="fill-preset-btn" bindtap="onFillBankFromPreset">一键填写</view>
             <view class="save-preset-btn" bindtap="onSaveBankToPreset">保存预设</view>
@@ -215,20 +215,20 @@
         </view>
         <view class="form-row">
           <view class="form-group" style="width:100%;">
-            <text class="form-label-small"><text class="required">*</text>户名</text>
-            <input class="form-input" placeholder="收款人姓名" value="{{groupForm.bankAccountName}}" data-field="bankAccountName" data-type="group" bindinput="onInput" />
+            <text class="form-label-small"><text class="required">*</text>领队名字</text>
+            <input class="form-input" placeholder="领队姓名" value="{{groupForm.bankAccountName}}" data-field="bankAccountName" data-type="group" bindinput="onInput" />
           </view>
         </view>
         <view class="form-row" style="margin-top:16rpx;">
           <view class="form-group" style="width:100%;">
-            <text class="form-label-small"><text class="required">*</text>卡号</text>
-            <input class="form-input" placeholder="银行卡号" value="{{groupForm.bankCardNumber}}" data-field="bankCardNumber" data-type="group" bindinput="onInput" />
+            <text class="form-label-small"><text class="required">*</text>领队ID</text>
+            <input class="form-input" placeholder="领队ID" value="{{groupForm.bankCardNumber}}" data-field="bankCardNumber" data-type="group" bindinput="onInput" />
           </view>
         </view>
         <view class="form-row" style="margin-top:16rpx;">
           <view class="form-group" style="width:100%;">
-            <text class="form-label-small"><text class="required">*</text>开户行</text>
-            <input class="form-input" placeholder="例如：招商银行深圳分行" value="{{groupForm.bankName}}" data-field="bankName" data-type="group" bindinput="onInput" />
+            <text class="form-label-small"><text class="required">*</text>集合地点</text>
+            <input class="form-input" placeholder="集合地点" value="{{groupForm.bankName}}" data-field="bankName" data-type="group" bindinput="onInput" />
           </view>
         </view>
       </view>

@@ -55,8 +55,12 @@ Page({
         }
       }
       // 计算是否已截止，补充展示字段
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = new Date().toISOString().slice(0, 10);
+      const toDateStr = (v) => {
+        if (!v) return '';
+        if (typeof v === 'string') return v.slice(0, 10);
+        try { return new Date(v).toISOString().slice(0, 10); } catch (e) { return String(v).slice(0, 10); }
+      };
       postsData = postsData.map((item, i) => {
         const isGroup = item.type === 'group';
         // 拼团显示有效期，非拼团显示创建时间
@@ -71,10 +75,10 @@ Page({
         }
         return {
           ...item,
-          isExpired: item.isExpired || item.isClosed || (item.validUntil ? new Date(item.validUntil + 'T23:59:59') < today : false),
+          isExpired: item.isExpired || item.isClosed || (item.validUntil ? toDateStr(item.validUntil) <= today : false),
           // 拼团活动需要的字段
           ...(isGroup ? {
-            tag: '拼团',
+            tag: '自驾',
             people: item.people || 0,
             styleIndex: item.styleIndex ?? (i % 7),
           } : {}),

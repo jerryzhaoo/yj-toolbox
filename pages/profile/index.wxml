@@ -94,6 +94,18 @@
         <text class="menu-arrow">›</text>
       </view>
     </view>
+
+    <!-- 版本信息 -->
+    <view class="menu-card version-card">
+      <view class="version-row">
+        <view class="version-info">
+          <text class="version-label">当前版本</text>
+          <text class="version-text">{{versionText}}</text>
+          <text class="version-env" wx:if="{{envLabel && appVersion}}">{{envLabel}}</text>
+        </view>
+        <button class="check-update-btn" bindtap="onCheckUpdate" loading="{{checkingUpdate}}">{{checkingUpdate ? '检查中...' : '检查更新'}}</button>
+      </view>
+    </view>
   </view>
 
   <!-- 管理员配置弹窗 -->

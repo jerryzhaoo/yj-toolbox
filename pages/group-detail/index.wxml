@@ -24,14 +24,14 @@
         </view>
       </view>
 
-      <!-- 价格 -->
+      <!-- 费用 -->
       <view class="price-box">
         <view class="price-row">
-          <text class="price-label">拼团价</text>
-          <text class="price-value">¥{{monthlyPrice}}</text>
-          <text class="price-original">¥{{originalPrice}}</text>
+          <text class="price-label">自驾里程</text>
+          <text class="price-value">{{monthlyPrice}}km</text>
+          <text class="price-original">原定{{originalPrice}}km</text>
           <view class="price-save">
-            <text>省¥{{originalPrice - monthlyPrice}}</text>
+            <text>少{{(originalPrice - monthlyPrice) > 0 ? originalPrice - monthlyPrice : 0}}km</text>
           </view>
         </view>
       </view>
@@ -51,11 +51,11 @@
       <text class="desc-text">{{activity.description}}</text>
     </view>
 
-    <!-- 拼团进度 -->
+    <!-- 报名进度 -->
     <view class="card progress-card">
       <view class="progress-header">
-        <text class="progress-title">拼团进度</text>
-        <text class="progress-info">已拼 <text class="highlight">{{currentMonths}}</text> 月 / 目标 {{targetMonths}} 月</text>
+        <text class="progress-title">报名进度</text>
+        <text class="progress-info">已报 <text class="highlight">{{currentMonths}}</text> 张 / 目标 {{targetMonths}} 张</text>
       </view>
 
       <view class="progress-bar">
@@ -64,20 +64,20 @@
         </view>
       </view>
 
-      <text class="progress-tip" wx:if="{{currentMonths >= targetMonths && targetMonths > 0}}">🎉 已达成目标，拼团成功！</text>
-      <text class="progress-tip" wx:elif="{{currentMonths > 0 && targetMonths > 0}}">还差 <text class="orange">{{targetMonths - currentMonths}}</text> 月即可达成优惠</text>
-      <text class="progress-tip" wx:else>目标 {{targetMonths}} 个月，快来加入吧</text>
+      <text class="progress-tip" wx:if="{{currentMonths >= targetMonths && targetMonths > 0}}">🎉 已达目标张数，即将成行！</text>
+      <text class="progress-tip" wx:elif="{{currentMonths > 0 && targetMonths > 0}}">还差 <text class="orange">{{targetMonths - currentMonths}}</text> 张</text>
+      <text class="progress-tip" wx:else>目标 {{targetMonths}} 张，快来加入吧</text>
     </view>
 
     <!-- 参与人员列表 -->
     <view class="card participants-card">
       <view class="participants-header">
         <view class="participants-title-wrap">
-          <text class="participants-title">参与人员 ({{participants.length}}人)</text>
+          <text class="participants-title">报名成员 ({{participants.length}}人)</text>
           <view class="participants-stat-row">
-            <text class="participants-stat">{{transferredCount}}人已转账 · {{untransferredCount}}人未转账</text>
+            <text class="participants-stat">{{transferredCount}}人已签到 · {{untransferredCount}}人未签到</text>
             <view wx:if="{{isAdmin && untransferredCount > 0}}" class="remind-btn" bindtap="onRemindTransfer">
-              <text class="remind-text">提醒转账</text>
+              <text class="remind-text">提醒签到</text>
             </view>
           </view>
         </view>
@@ -99,9 +99,9 @@
           <view class="table-header">
             <text class="th" style="width: 14%;">姓名</text>
             <text class="th" style="width: 18%;">车牌号</text>
-            <text class="th" style="width: 10%;">月数</text>
-            <text class="th" style="width: 14%;">应付</text>
-            <text class="th" style="width: 12%;">转账</text>
+            <text class="th" style="width: 10%;">卡数</text>
+            <text class="th" style="width: 14%;">共计</text>
+            <text class="th" style="width: 12%;">确认</text>
             <text class="th" style="width: 16%;">凭证</text>
             <text class="th" style="width: 16%;" wx:if="{{isAdmin}}">操作</text>
           </view>
@@ -110,7 +110,7 @@
               <text class="td" style="width: 14%;">{{item._displayName || item.name}}</text>
               <text class="td mono" style="width: 18%;">{{item._displayCarNumber || item.carNumber}}</text>
               <text class="td purple" style="width: 10%;">{{item.months}}</text>
-              <text class="td" style="width: 14%;">¥{{item.months * monthlyPrice}}</text>
+              <text class="td" style="width: 14%;">{{item.months * monthlyPrice}}</text>
               <text class="td" style="width: 12%; color: {{item.hasTransfer ? '#22C55E' : '#9CA3AF'}};">{{item.hasTransfer ? '是' : '否'}}</text>
               <view class="td" style="width: 16%;" wx:if="{{item.voucherUrl}}">
                 <image class="voucher-thumb" src="{{item._voucherTempUrl || item.voucherUrl}}" mode="aspectFill" data-url="{{item._voucherTempUrl || item.voucherUrl}}" catchtap="onPreviewVoucher" />
@@ -126,36 +126,36 @@
       </view>
       <view class="trust-tip">
         <text class="trust-star">*</text>
-        <text>请如实填写，如核实后发现凭证虚假实际未转账，则永久拉入拼团黑名单！！！</text>
+        <text>请如实填写报名信息，如有虚假将列入活动黑名单。</text>
       </view>
     </view>
 
-    <!-- 转账信息卡片（仅已报名或管理员可见） -->
+    <!-- 集合信息卡片 -->
     <view wx:if="{{activity.bankAccountName || activity.bankCardNumber || activity.bankName}}" class="bank-info-card">
       <view class="bank-info-header">
-        <text class="bank-info-icon">💳</text>
-        <text class="bank-info-title">转账信息</text>
+        <text class="bank-info-icon">🥾</text>
+        <text class="bank-info-title">集合信息</text>
       </view>
       <view wx:if="{{hasSignedUp || isAdmin}}" class="bank-info-body">
         <view class="bank-field">
-          <text class="bank-label">户名</text>
+          <text class="bank-label">领队名字</text>
           <text class="bank-value" user-select>{{displayBankAccountName || '暂无'}}</text>
           <text class="bank-copy" catchtap="onCopyBankText" data-field="bankAccountName">复制</text>
         </view>
         <view class="bank-field">
-          <text class="bank-label">卡号</text>
+          <text class="bank-label">领队ID</text>
           <text class="bank-value" user-select>{{displayBankCardNumber || '暂无'}}</text>
           <text class="bank-copy" catchtap="onCopyBankText" data-field="bankCardNumber">复制</text>
         </view>
         <view class="bank-field">
-          <text class="bank-label">开户行</text>
+          <text class="bank-label">集合地点</text>
           <text class="bank-value" user-select>{{displayBankName || '暂无'}}</text>
           <text class="bank-copy" catchtap="onCopyBankText" data-field="bankName">复制</text>
         </view>
       </view>
       <block wx:else>
         <view class="bank-info-body">
-          <text class="bank-no-auth">报名后可查看转账信息</text>
+          <text class="bank-no-auth">报名后可查看集合信息</text>
         </view>
       </block>
     </view>
@@ -164,7 +164,7 @@
     <view class="tips-box {{isExpired ? 'tips-gray' : 'tips-blue'}}">
       <text class="tips-title">{{isExpired ? '活动已结束' : '温馨提示'}}</text>
       <block wx:if="{{isExpired}}">
-        <text class="tips-item">• 该拼团活动已于 {{closeTimeText}} 截止</text>
+        <text class="tips-item">• 该活动已于 {{closeTimeText}} 截止</text>
         <text class="tips-item">• 感谢您的关注，敬请期待下次活动</text>
       </block>
       <block wx:else>
@@ -172,10 +172,10 @@
           <text class="tips-item" wx:for="{{tipsList}}" wx:key="index">• {{item}}</text>
         </block>
         <block wx:else>
-          <text class="tips-item" wx:if="{{targetMonths > 0}}">• 拼团满{{targetMonths}}个月即可享受优惠价格</text>
-          <text class="tips-item">• 拼团成功后联系您办理</text>
-          <text class="tips-item">• 车牌信息需准确，否则无法正常使用</text>
-          <text class="tips-item">• 拼团失败全额退款至原支付账户</text>
+          <text class="tips-item" wx:if="{{targetMonths > 0}}">• 目标{{targetMonths}}张即可成行</text>
+          <text class="tips-item">• 报名成功后联系您确认行程</text>
+          <text class="tips-item">• 请确保个人信息准确无误</text>
+          <text class="tips-item">• 活动取消将全额退还报名费用</text>
         </block>
       </block>
     </view>
@@ -258,9 +258,9 @@
             </view>
           </view>
           <view class="form-group">
-            <text class="form-label"><text class="required-star">*</text>购买月数</text>
+            <text class="form-label"><text class="required-star">*</text>张数</text>
             <view class="input-wrap">
-              <input name="months" type="number" placeholder="月数" class="form-input" value="{{signForm.months}}" data-field="months" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <input name="months" type="number" placeholder="张" class="form-input" value="{{signForm.months}}" data-field="months" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
               <view wx:if="{{focusedField === 'months' && signForm.months}}" class="clear-btn" catchtap="onClearSignInput" data-field="months">✕</view>
             </view>
           </view>
@@ -284,7 +284,7 @@
           </view>
         </view>
         <view class="form-group switch-group">
-          <text class="form-label">是否转账</text>
+          <text class="form-label">是否已签到</text>
           <view class="switch-wrap">
             <text class="switch-label {{signForm.hasTransfer ? '' : 'active'}}">否</text>
             <switch class="transfer-switch" checked="{{signForm.hasTransfer}}" data-field="hasTransfer" bindchange="onSignInput" color="#3B82F6" />
@@ -292,7 +292,7 @@
           </view>
         </view>
         <view class="form-group" wx:if="{{signForm.hasTransfer}}">
-          <text class="form-label"><text class="required-star">*</text>上传转账凭证</text>
+          <text class="form-label"><text class="required-star">*</text>上传签到凭证</text>
           <view class="upload-box" bindtap="onUploadVoucher" wx:if="{{!signForm.voucherUrl}}">
             <view class="upload-icon-wrap">
               <image class="upload-svg" src="/assets/icons/upload.svg" mode="aspectFit" />
@@ -308,7 +308,7 @@
         </view>
         <view class="trust-tip" style="margin:0 0 10rpx;">
           <text class="trust-star">*</text>
-          <text>请如实填写，如核实后发现凭证虚假实际未转账，则永久拉入拼团黑名单！！！</text>
+          <text>请如实填写，信息虚假将影响后续参与资格。</text>
         </view>
         <!-- 发票信息 -->
         <view class="form-group invoice-section">
@@ -363,8 +363,8 @@
     <view class="modal-content success-modal" catchtap="stopPropagation">
       <view class="success-icon"><text class="check-icon">✓</text></view>
       <text class="success-title">报名成功！</text>
-      <text class="success-desc">拼团成功后需要转账，开启提醒避免错过</text>
-      <view class="btn-know btn-subscribe" bindtap="onSubscribeTransferRemind">开启转账提醒</view>
+      <text class="success-desc">报名成功后请及时完成签到，开启通知避免错过</text>
+      <view class="btn-know btn-subscribe" bindtap="onSubscribeTransferRemind">开启签到通知</view>
       <view class="btn-skip" bindtap="onCloseSuccess">稍后再说</view>
     </view>
   </view>
@@ -382,11 +382,11 @@
       <view class="export-filter">
         <view class="export-checkbox {{exportOnlyTransferred ? 'checked' : ''}}" bindtap="onToggleExportFilter">
           <view class="checkbox-box">{{exportOnlyTransferred ? '✓' : ''}}</view>
-          <text class="checkbox-label">仅导出已转账用户</text>
+          <text class="checkbox-label">仅导出已签到用户</text>
         </view>
       </view>
       <view class="export-warning">
-        <text>注意：导出的数据包含姓名、车牌号、月数、支付方式等个人信息，请妥善保管</text>
+        <text>注意：导出的数据包含姓名、车牌号等个人信息，请妥善保管</text>
       </view>
       <view class="modal-btns">
         <button type="button" class="btn-cancel" bindtap="onCloseExportConfirm">取消</button>
@@ -447,9 +447,9 @@
             </view>
           </view>
           <view class="form-group">
-            <text class="form-label"><text class="required-star">*</text>购买月数</text>
+            <text class="form-label"><text class="required-star">*</text>张数</text>
             <view class="input-wrap">
-              <input name="months" type="number" placeholder="月数" class="form-input" value="{{viewSignForm.months}}" data-field="months" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <input name="months" type="number" placeholder="张" class="form-input" value="{{viewSignForm.months}}" data-field="months" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
               <view wx:if="{{focusedField === 'months' && !viewReadonly && viewSignForm.months}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="months">✕</view>
             </view>
           </view>
@@ -478,7 +478,7 @@
           </block>
         </view>
         <view class="form-group switch-group">
-          <text class="form-label">是否转账</text>
+          <text class="form-label">是否已签到</text>
           <view class="switch-wrap">
             <text class="switch-label {{viewSignForm.hasTransfer ? '' : 'active'}}">否</text>
             <switch class="transfer-switch" checked="{{viewSignForm.hasTransfer}}" data-field="hasTransfer" disabled="{{viewReadonly}}" bindchange="onViewSignInput" color="#3B82F6" />
@@ -486,7 +486,7 @@
           </view>
         </view>
         <view class="form-group" wx:if="{{viewSignForm.hasTransfer}}">
-          <text class="form-label"><text class="required-star">*</text>上传转账凭证</text>
+          <text class="form-label"><text class="required-star">*</text>上传签到凭证</text>
           <view wx:if="{{!viewReadonly && !viewSignForm.voucherUrl}}" class="upload-box" catchtap="onViewUploadVoucher">
             <view class="upload-icon-wrap">
               <image class="upload-svg" src="/assets/icons/upload.svg" mode="aspectFit" />
@@ -502,7 +502,7 @@
         </view>
         <view class="trust-tip" style="margin:0 0 6rpx;">
           <text class="trust-star">*</text>
-          <text>请如实填写，如核实后发现凭证虚假实际未转账，则永久拉入拼团黑名单！！！</text>
+          <text>请如实填写，信息虚假将影响后续参与资格。</text>
         </view>
         <!-- 发票信息 -->
         <view class="form-group invoice-section">

@@ -1513,8 +1513,9 @@
 .bank-label {
   font-size: 24rpx;
   color: #888888;
-  width: 80rpx;
+  width: 120rpx;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 .bank-value {
   font-size: 24rpx;

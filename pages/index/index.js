@@ -61,7 +61,22 @@ Page({
         db.collection('activities').where({ type: 'group' }).orderBy('createdAt', 'desc').limit(20).get(),
         db.collection('activities').where({ type: 'transfer', status: 'active' }).orderBy('updatedAt', 'desc').limit(20).get(),
       ]);
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const toDateStr = (v) => {
+        if (!v) return '';
+        if (typeof v === 'string') return v.slice(0, 10);
+        try { return new Date(v).toISOString().slice(0, 10); } catch (e) { return String(v).slice(0, 10); }
+      };
       let transferData = transferRes.data;
+      transferData = transferData.map(item => {
+        const expired = item.isClosed;
+        const dateExpired = !expired && item.validUntil && toDateStr(item.validUntil) <= todayStr;
+        const isExpired = expired || dateExpired;
+        if (dateExpired) {
+          wx.cloud.callFunction({ name: 'autoExpireActivity', data: { activityId: item._id } }).catch(() => {});
+        }
+        return { ...item, isExpired };
+      });
       if (this.data.sortBy === '综合') {
         transferData = this.shuffleArray([...transferData]);
       }
@@ -76,18 +91,12 @@ Page({
           participantSums[p.activityId] = (participantSums[p.activityId] || 0) + (Number(p.months) || 0);
         }
       }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
       let groupData = groupRes.data.map((item, i) => {
-        let isExpired = item.isExpired || item.isClosed || false;
-        if (item.validUntil && !isExpired) {
-          const endDate = new Date(item.validUntil + 'T23:59:59');
-          if (endDate < today) {
-            isExpired = true;
-            db.collection('activities').doc(item._id).update({
-              data: { status: 'expired', isExpired: true }
-            }).catch(() => {});
-          }
+        const expired = item.isClosed;
+        const dateExpired = !expired && item.validUntil && toDateStr(item.validUntil) <= todayStr;
+        const isExpired = expired || dateExpired;
+        if (dateExpired) {
+          wx.cloud.callFunction({ name: 'autoExpireActivity', data: { activityId: item._id } }).catch(() => {});
         }
         return {
           ...item,

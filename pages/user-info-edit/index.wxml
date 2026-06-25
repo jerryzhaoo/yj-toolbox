@@ -266,31 +266,31 @@
     </block>
   </view>
 
-  <!-- 转账信息（仅管理员可见） -->
+  <!-- 集合信息（仅管理员可见） -->
   <view wx:if="{{isAdmin}}" class="detail-card">
     <view class="card-header">
-      <text class="card-title">转账信息</text>
+      <text class="card-title">集合信息</text>
     </view>
     <view class="form-row">
-      <text class="form-label">户名</text>
+      <text class="form-label">领队名字</text>
       <block wx:if="{{isEditing}}">
-        <input class="form-input" type="text" placeholder="收款人姓名" value="{{formData.bankAccountName}}" data-field="bankAccountName" bindinput="onInput" />
+        <input class="form-input" type="text" placeholder="领队姓名" value="{{formData.bankAccountName}}" data-field="bankAccountName" bindinput="onInput" />
       </block>
       <block wx:else>
         <text class="form-value {{formData.bankAccountName ? '' : 'placeholder'}}">{{formData.bankAccountName || '未填写'}}</text>
       </block>
     </view>
     <view class="form-row">
-      <text class="form-label">卡号</text>
+      <text class="form-label">领队ID</text>
       <block wx:if="{{isEditing}}">
-        <input class="form-input" type="number" placeholder="银行卡号" value="{{formData.bankCardNumber}}" data-field="bankCardNumber" bindinput="onInput" />
+        <input class="form-input" type="number" placeholder="领队ID" value="{{formData.bankCardNumber}}" data-field="bankCardNumber" bindinput="onInput" />
       </block>
       <block wx:else>
         <text class="form-value {{formData.bankCardNumber ? '' : 'placeholder'}}">{{formData.bankCardNumber || '未填写'}}</text>
       </block>
     </view>
     <view class="form-row last">
-      <text class="form-label">开户行</text>
+      <text class="form-label">集合地点</text>
       <block wx:if="{{isEditing}}">
         <input class="form-input" type="text" placeholder="开户行名称" value="{{formData.bankName}}" data-field="bankName" bindinput="onInput" />
       </block>

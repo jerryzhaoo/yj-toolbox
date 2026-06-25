@@ -76,9 +76,18 @@ Page({
         this.getOpenid()
       ]);
       const activity = docRes.data;
-      const now = new Date();
-      const endDate = activity.validUntil ? new Date(activity.validUntil) : null;
-      const isExpired = activity.isClosed || activity.isExpired || (endDate ? endDate < now : false);
+      const toDateStr = (v) => {
+        if (!v) return '';
+        if (typeof v === 'string') return v.slice(0, 10);
+        try { return new Date(v).toISOString().slice(0, 10); } catch (e) { return String(v).slice(0, 10); }
+      };
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const dateExpired = activity.validUntil && toDateStr(activity.validUntil) <= todayStr;
+      const isExpired = activity.isClosed || dateExpired;
+      // 同步更新数据库，确保首页也能读到已截止
+      if (dateExpired && !activity.isClosed) {
+        wx.cloud.callFunction({ name: 'autoExpireActivity', data: { activityId: id } }).catch(() => {});
+      }
 
       const tipsList = activity.tips
         ? activity.tips.split('\n').map(t => t.trim()).filter(Boolean)
@@ -452,8 +461,8 @@ Page({
     if (!name || !name.trim()) { wx.showToast({ title: '请输入姓名', icon: 'none' }); return; }
     if (!phone || !phone.trim()) { wx.showToast({ title: '请输入手机号', icon: 'none' }); return; }
     if (!carNumber || !carNumber.trim()) { wx.showToast({ title: '请输入车牌号', icon: 'none' }); return; }
-    if (!months || Number(months) <= 0) { wx.showToast({ title: '请输入购买月数', icon: 'none' }); return; }
-    if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传转账凭证', icon: 'none' }); return; }
+    if (!months || Number(months) <= 0) { wx.showToast({ title: '请输入张数', icon: 'none' }); return; }
+    if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传签到凭证', icon: 'none' }); return; }
     if (needInvoice) {
       if (!companyName || !companyName.trim()) { wx.showToast({ title: '请输入公司名称', icon: 'none' }); return; }
       if (!email || !email.trim()) { wx.showToast({ title: '请输入接收邮箱', icon: 'none' }); return; }
@@ -611,8 +620,8 @@ Page({
     if (!name || !name.trim()) { wx.showToast({ title: '请输入姓名', icon: 'none' }); return; }
     if (!phone || !phone.trim()) { wx.showToast({ title: '请输入手机号', icon: 'none' }); return; }
     if (!carNumber || !carNumber.trim()) { wx.showToast({ title: '请输入车牌号', icon: 'none' }); return; }
-    if (!months || Number(months) <= 0) { wx.showToast({ title: '请输入购买月数', icon: 'none' }); return; }
-    if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传转账凭证', icon: 'none' }); return; }
+    if (!months || Number(months) <= 0) { wx.showToast({ title: '请输入张数', icon: 'none' }); return; }
+    if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传签到凭证', icon: 'none' }); return; }
     if (needInvoice) {
       if (!companyName || !companyName.trim()) { wx.showToast({ title: '请输入公司名称', icon: 'none' }); return; }
       if (!taxNumber || !taxNumber.trim()) { wx.showToast({ title: '请输入税号', icon: 'none' }); return; }
@@ -688,7 +697,7 @@ Page({
 
   onCloseSuccess() { this.setData({ showSuccessModal: false }); },
 
-  // 订阅转账提醒
+  // 签到通知
   async onSubscribeTransferRemind() {
     const TEMPLATE_ID = 'OtGg5Rl3jazsLotI0NKepVAs-xMDRdY47uFWBpd4fDg';
     try {
@@ -708,7 +717,7 @@ Page({
         } catch (e) { console.warn('保存订阅记录失败:', e); }
         wx.showToast({ title: '已开启提醒', icon: 'success' });
       } else {
-        wx.showToast({ title: '取消订阅，仍可转账', icon: 'none' });
+        wx.showToast({ title: '取消订阅，别忘了签到', icon: 'none' });
       }
     } catch (err) {
       console.error('订阅消息失败:', err);
@@ -717,11 +726,11 @@ Page({
     this.setData({ showSuccessModal: false });
   },
 
-  // 管理员一键提醒转账
+  // 管理员一键提醒签到
   async onRemindTransfer() {
     wx.showModal({
-      title: '提醒转账',
-      content: `将向 ${this.data.untransferredCount} 位未转账用户发送订阅消息提醒，确认发送？`,
+      title: '提醒签到',
+      content: `将向 ${this.data.untransferredCount} 位未签到用户发送订阅消息提醒，确认发送？`,
       success: async (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '发送中...' });
@@ -730,7 +739,7 @@ Page({
               name: 'sendTransferReminder',
               data: {
                 activityId: this.data.activityId,
-                activityTitle: this.data.activity?.title || '拼团活动',
+                activityTitle: this.data.activity?.title || '报名活动',
                 monthlyPrice: this.data.monthlyPrice || 0,
               }
             });
@@ -788,7 +797,7 @@ Page({
         ].map(esc).join(',');
       }).join('\n');
 
-      const activityTitle = (this.data.activity && this.data.activity.title) || '拼团';
+      const activityTitle = (this.data.activity && this.data.activity.title) || '活动';
       const csv = '\uFEFF' + headers.map(esc).join(',') + '\n' + rows;
 
       const fileName = `${activityTitle}_${Date.now()}.csv`;
@@ -891,7 +900,7 @@ Page({
       ctx.fillText(loc, 20, 16);
 
       // 标题
-      const title = activity.title || '拼团活动';
+      const title = activity.title || '报名活动';
       ctx.setFillStyle('#ffffff');
       ctx.setFontSize(22);
       let dt = title;
@@ -926,7 +935,7 @@ Page({
       const priceTop = headerH + 16;
       const groupPrice = activity.groupPrice || 0;
       const originalPrice = activity.originalPrice || 0;
-      const priceStr = `¥${groupPrice}`;
+      const priceStr = `自驾${groupPrice}km`;
       ctx.setFillStyle('#F97316');
       ctx.setFontSize(34);
       ctx.setTextAlign('left');
@@ -934,7 +943,7 @@ Page({
       ctx.fillText(priceStr, 20, priceTop);
 
       if (originalPrice > groupPrice) {
-        const origStr = `¥${originalPrice}`;
+        const origStr = `原定${originalPrice}km`;
         ctx.setFillStyle('#9CA3AF');
         ctx.setFontSize(16);
         const ox = 20 + priceStr.length * 19;
@@ -949,7 +958,7 @@ Page({
         // 省钱标签
         ctx.setFillStyle('#F97316');
         ctx.setFontSize(14);
-        ctx.fillText(`省¥${originalPrice - groupPrice}`, ox + origStr.length * 10 + 10, priceTop + 8);
+        ctx.fillText(`多${originalPrice - groupPrice}km`, ox + origStr.length * 10 + 10, priceTop + 8);
       }
 
       // 拼团进度行
@@ -958,7 +967,7 @@ Page({
       ctx.setFillStyle('#333333');
       ctx.setFontSize(17);
       ctx.setTextAlign('left');
-      ctx.fillText('拼团进度', 20, pInfoTop);
+      ctx.fillText('报名进度', 20, pInfoTop);
 
       // 右边拼团信息整体右对齐（不用measureText，用固定字符宽度更可靠）
       const curStr = String(currentMonths);
@@ -966,28 +975,28 @@ Page({
       const charW = 15; // 每个中文字符/数字的近似宽度
       
       // 从右往左布局:
-      //  月/目标40月      → 长度: 6+数字位数 个字符宽度
+      //  张/目标40张      → 长度: 6+数字位数 个字符宽度
       //  40 (橙色数字)   → 长度: 数字位数 个字符宽度
-      //  已拼             → 长度: 2 个字符宽度
-      const rightPartsWidth = (6 + tgtStr.length) * charW;   // "月 / 目标 X月"
+      //  已报             → 长度: 2 个字符宽度
+      const rightPartsWidth = (6 + tgtStr.length) * charW;   // "张 / 目标 X张"
       const numPartWidth = curStr.length * charW;            // 数字
-      const yipinWidth = 2 * charW;                          // "已拼"
+      const yipinWidth = 2 * charW;                          // "已报"
       const totalWidth = rightPartsWidth + numPartWidth + yipinWidth + 12;
       
       const rightStartX = canvasW - 20 - totalWidth;
-      // "已拼"
+      // "已报"
       ctx.setFillStyle('#666666');
       ctx.setFontSize(15);
       ctx.setTextAlign('left');
-      ctx.fillText('已拼', rightStartX, pInfoTop);
+      ctx.fillText('已报', rightStartX, pInfoTop);
       // 数字（橙色）
       ctx.setFillStyle('#F97316');
       ctx.setFontSize(17);
       ctx.fillText(curStr, rightStartX + yipinWidth + 6, pInfoTop - 1);
-      // "月 / 目标 X月"
+      // "张 / 目标 X张"
       ctx.setFillStyle('#666666');
       ctx.setFontSize(15);
-      ctx.fillText(`月 / 目标 ${tgtStr}月`, rightStartX + yipinWidth + numPartWidth + 10, pInfoTop);
+      ctx.fillText(`张 / 目标 ${tgtStr}张`, rightStartX + yipinWidth + numPartWidth + 10, pInfoTop);
 
       // 下方提示 - 紧凑间距，放大文字
       const tipTop = pInfoTop + 32;
@@ -995,7 +1004,7 @@ Page({
         ctx.setFillStyle('#22C55E');
         ctx.setFontSize(19); // 放大已达成文字
         ctx.setTextAlign('left');
-        ctx.fillText('🎉 已达成目标，拼团成功！', 20, tipTop);
+        ctx.fillText('🎉 已达目标张数，即将成行！', 20, tipTop);
       } else if (currentMonths > 0 && targetMonths > 0) {
         const rem = targetMonths - currentMonths;
         const remStr = String(rem);
@@ -1008,12 +1017,12 @@ Page({
         ctx.fillText(remStr, 20 + 34, tipTop - 1);
         ctx.setFillStyle('#6B7280');
         ctx.setFontSize(16);
-        ctx.fillText('月即可达成优惠', 20 + 34 + remStr.length * 10, tipTop);
+        ctx.fillText('张即可成行', 20 + 34 + remStr.length * 10, tipTop);
       } else {
         ctx.setFillStyle('#6B7280');
         ctx.setFontSize(16);
         ctx.setTextAlign('left');
-        ctx.fillText(`目标 ${targetMonths} 个月，快来加入吧`, 20, tipTop);
+        ctx.fillText(`目标 ${targetMonths} 张，快来加入吧`, 20, tipTop);
       }
 
       // 底部截止日期 - 紧贴底部减少空白
@@ -1059,13 +1068,13 @@ Page({
 
   onShareAppMessage() {
     const activity = this.data.activity || {};
-    const shareData = { title: activity.title || '拼团活动', path: `/pages/group-detail/index?id=${this.data.activityId}` };
+    const shareData = { title: activity.title || '报名活动', path: `/pages/group-detail/index?id=${this.data.activityId}` };
     if (this.data._shareImage) shareData.imageUrl = this.data._shareImage;
     return shareData;
   },
   onShareTimeline() {
     const activity = this.data.activity || {};
-    const shareData = { title: activity.title || '拼团活动' };
+    const shareData = { title: activity.title || '报名活动' };
     if (this.data._shareImage) shareData.imageUrl = this.data._shareImage;
     return shareData;
   },

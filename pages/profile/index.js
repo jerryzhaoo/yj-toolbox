@@ -33,9 +33,27 @@ Page({
     showActivateModal: false,
     activateCode: '',
     activateError: '',
+    appVersion: '',
+    envLabel: '',
+    versionText: '',
+    checkingUpdate: false,
   },
 
   async onLoad() {
+    // 加载版本信息（version 只有正式版才有值，开发版/体验版为空）
+    try {
+      const accountInfo = wx.getAccountInfoSync();
+      const { version, envVersion } = accountInfo.miniProgram;
+      const envMap = { develop: '开发版', trial: '体验版', release: '正式版' };
+      const envLabel = envMap[envVersion] || envVersion;
+      this.setData({
+        appVersion: version || '',
+        envLabel,
+        versionText: version ? `v${version}` : envLabel,
+      });
+    } catch (e) {
+      this.setData({ appVersion: '', envLabel: '未知', versionText: '未知' });
+    }
     await this.loadUserInfo();
     await this.loadCounts();
     await this.checkAdmin();
@@ -283,6 +301,55 @@ Page({
 
   onActivateCodeInput(e) { this.setData({ activateCode: e.detail.value.toUpperCase(), activateError: '' }); },
   stopPropagation() {},
+
+  // ====== 检查更新 ======
+  onCheckUpdate() {
+    if (this.data.checkingUpdate) return;
+    const updateManager = app.globalData.updateManager;
+    if (!updateManager) {
+      wx.showToast({ title: '当前环境不支持更新检测', icon: 'none' });
+      return;
+    }
+
+    this.setData({ checkingUpdate: true });
+
+    // 监听更新检测结果（3秒超时）
+    let resolved = false;
+    const timer = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        this.setData({ checkingUpdate: false });
+        wx.showToast({ title: '当前已是最新版本', icon: 'none' });
+      }
+    }, 3000);
+
+    updateManager.onCheckForUpdate((res) => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(timer);
+      this.setData({ checkingUpdate: false });
+      if (res.hasUpdate) {
+        wx.showToast({ title: '发现新版本，正在后台下载...', icon: 'none', duration: 2000 });
+      } else {
+        wx.showToast({ title: '当前已是最新版本', icon: 'none' });
+      }
+    });
+
+    // 监听下载完成
+    updateManager.onUpdateReady(() => {
+      wx.showModal({
+        title: '更新就绪',
+        content: '新版本已下载完成，是否立即重启应用？',
+        confirmText: '立即重启',
+        cancelText: '稍后',
+        success: (modalRes) => {
+          if (modalRes.confirm) {
+            updateManager.applyUpdate();
+          }
+        }
+      });
+    });
+  },
 
   // ====== 分享功能 ======
   onShareAppMessage() {

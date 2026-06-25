@@ -380,6 +380,12 @@
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
 }
 
+/* 已截止活动 - 置灰 */
+.card-expired {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
 .card-image {
   border-radius: 0;
   height: 200rpx;

@@ -8,7 +8,7 @@
           <view class="card-image {{'style' + (item.styleIndex % 7)}}">
             <view class="status-badge {{item.isExpired ? 'badge-expired' : 'badge-active'}}">{{item.isExpired ? '已截止' : '进行中'}}</view>
             <view class="card-content">
-              <text class="card-title">{{item.tag === '拼团' ? '拼团上车共赴精彩决斗！' : '优惠月卡等你来'}}</text>
+              <text class="card-title">{{item.tag === '自驾' ? '自驾活动' : '优惠报名中'}}</text>
               <view class="card-badge">满10人即可开团</view>
               <text class="card-desc">报名即享优惠</text>
             </view>
@@ -44,7 +44,7 @@
         <view wx:else class="post-card card {{item.isExpired ? 'expired' : ''}}" data-item="{{item}}" bindtap="onCardClick">
           <view class="post-expired-badge {{item.isExpired ? 'badge-expired' : 'badge-active'}}">{{item.isExpired ? '已截止' : '进行中'}}</view>
           <view class="post-type-badge {{item.type}} {{item.isExpired ? 'expired' : ''}}">
-            {{item.type === 'group' ? '拼团' : item.type === 'transfer' ? '月卡转让' : item.type === 'secondhand' ? '闲置二手' : item.type === 'job' ? '招聘信息' : item.type}}
+            {{item.type === 'group' ? '自驾' : item.type === 'transfer' ? '月卡转让' : item.type === 'secondhand' ? '闲置二手' : item.type === 'job' ? '招聘信息' : item.type}}
           </view>
           <view class="post-content">
             <view class="post-left {{item.images && item.images.length > 0 ? '' : getImageStyle(item.imageStyle)}}">
@@ -56,7 +56,7 @@
               />
               <view wx:else class="image-placeholder-box">
                 <text class="placeholder-icon">{{item.type === 'transfer' ? '🔄' : item.type === 'secondhand' ? '🏷️' : item.type === 'job' ? '💼' : '🚗'}}</text>
-                <text class="placeholder-label">{{item.type === 'transfer' ? '月卡转让' : item.type === 'secondhand' ? '闲置二手' : item.type === 'job' ? '招聘信息' : '拼团活动'}}</text>
+                <text class="placeholder-label">{{item.type === 'transfer' ? '月卡转让' : item.type === 'secondhand' ? '闲置二手' : item.type === 'job' ? '招聘信息' : '自驾活动'}}</text>
               </view>
             </view>
             <view class="post-right">
