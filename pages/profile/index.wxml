@@ -221,14 +221,19 @@
       <text class="tab-text">首页</text>
     </view>
 
-    <view class="tab-center" bindtap="onPublishClick">
-      <view class="center-btn">
-        <view class="plus-icon">
-          <view class="plus-h"></view>
-          <view class="plus-v"></view>
+    <block wx:if="{{isAdmin}}">
+      <view class="tab-center" bindtap="onPublishClick">
+        <view class="center-btn">
+          <view class="plus-icon">
+            <view class="plus-h"></view>
+            <view class="plus-v"></view>
+          </view>
         </view>
       </view>
-    </view>
+    </block>
+    <block wx:else>
+      <view class="tab-center tab-center-deco"></view>
+    </block>
 
     <view class="tab-item active" bindtap="goToProfileSelf">
       <view class="tab-icon">
