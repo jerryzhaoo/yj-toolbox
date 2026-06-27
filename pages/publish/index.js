@@ -15,7 +15,7 @@ Page({
     showSuccessModal: false,
     isSubmitting: false,
     loading: true,
-    // 拼团表单
+    // 报名活动表单
     formKey: 0,
     groupForm: {
       title: '',
@@ -37,52 +37,18 @@ Page({
       validFrom: '',
       validUntil: '',
     },
-    // 转让表单
-    transferForm: {
-      title: '',
-      price: '',
-      originalPrice: '',
-      parkingLot: '',
-      parkingName: '',
-      parkingAddress: '',
-      parkingLat: 0,
-      parkingLng: 0,
-      validFrom: '',
-      validUntil: '',
-      description: '',
-    },
-    // 二手表单
-    secondhandForm: {
-      title: '',
-      price: '',
-      location: '',
-      brand: '',
-      condition: '9成新',
-      purchaseDate: '',
-      description: '',
-    },
-    // 招聘表单
-    jobForm: {
-      title: '',
-      salary: '',
-      jobType: '全职',
-      location: '',
-      requirements: '',
-      benefits: '',
-      workTime: '',
-      description: '',
-    },
     showPrivacyModal: false,
     privacyPurposes: [],
     pendingSave: null,
   },
 
-  types: ['group', 'transfer', 'secondhand', 'job'],
-  typeLabels: ['报名活动', '月卡转让', '闲置二手', '招聘信息'],
-
   async onLoad(options) {
     const isAdmin = await this.checkAdmin();
-    const publishType = isAdmin ? 'group' : 'transfer';
+    // 非管理员直接跳回首页
+    if (!isAdmin) {
+      wx.switchTab({ url: '/pages/index/index' });
+      return;
+    }
     
     if (options.edit && options.id) {
       // 编辑模式
@@ -134,9 +100,8 @@ Page({
     const thirtyDaysLater = this.formatDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
     this.setData({
       isAdmin,
-      publishType,
-      'transferForm.validFrom': today,
-      'transferForm.validUntil': thirtyDaysLater,
+      'groupForm.validFrom': today,
+      'groupForm.validUntil': thirtyDaysLater,
       loading: false,
     });
   },
@@ -184,81 +149,34 @@ Page({
     try {
       const res = await db.collection('activities').doc(id).get();
       const editData = res.data;
-      let publishType = editData.type || 'group';
 
-      let groupForm = { ...this.data.groupForm };
-      let transferForm = { ...this.data.transferForm };
-      let secondhandForm = { ...this.data.secondhandForm };
-      let jobForm = { ...this.data.jobForm };
-      let uploadedImages = editData.images || [];
-      let imageFileIDs = editData.images || [];
-
-      if (publishType === 'transfer') {
-        transferForm = {
-          title: editData.title || '',
-          price: editData.price || '',
-          originalPrice: editData.originalPrice || '',
-          parkingLot: editData.parkingLot || '',
-          parkingName: editData.parkingName || '',
-          parkingAddress: editData.parkingAddress || '',
-          parkingLat: editData.parkingLat || 0,
-          parkingLng: editData.parkingLng || 0,
-          validFrom: editData.validFrom || '',
-          validUntil: editData.validUntil || '',
-          description: editData.description || '',
-        };
-      } else if (publishType === 'secondhand') {
-        secondhandForm = {
-          title: editData.title || '',
-          price: editData.price || '',
-          location: editData.location || '',
-          brand: editData.brand || '',
-          condition: editData.condition || '9成新',
-          purchaseDate: editData.purchaseDate || '',
-          description: editData.description || '',
-        };
-      } else if (publishType === 'job') {
-        jobForm = {
-          title: editData.title || '',
-          salary: editData.salary || '',
-          jobType: editData.jobType || '全职',
-          location: editData.location || '',
-          requirements: editData.requirements || '',
-          benefits: editData.benefits || '',
-          workTime: editData.workTime || '',
-          description: editData.description || '',
-        };
-      } else {
-        groupForm = {
-          title: editData.title || '',
-          description: editData.description || '',
-          location: editData.location || '',
-          locationName: editData.locationName || '',
-          locationAddress: editData.locationAddress || '',
-          locationLat: editData.locationLat || 0,
-          locationLng: editData.locationLng || 0,
-          targetMonths: editData.targetMonths || '',
-          groupPrice: editData.groupPrice || '',
-          originalPrice: editData.originalPrice || '',
-          tips: editData.tips || '',
-          isClosed: editData.isClosed || false,
-          bankAccountName: editData.bankAccountName || '',
-          bankCardNumber: editData.bankCardNumber || '',
-          bankName: editData.bankName || '',
-          participants: editData.participants ?? 0,
-          validFrom: editData.validFrom || '',
-          validUntil: editData.validUntil || '',
-        };
-      }
+      const groupForm = {
+        title: editData.title || '',
+        description: editData.description || '',
+        location: editData.location || '',
+        locationName: editData.locationName || '',
+        locationAddress: editData.locationAddress || '',
+        locationLat: editData.locationLat || 0,
+        locationLng: editData.locationLng || 0,
+        targetMonths: editData.targetMonths || '',
+        groupPrice: editData.groupPrice || '',
+        originalPrice: editData.originalPrice || '',
+        tips: editData.tips || '',
+        isClosed: editData.isClosed || false,
+        bankAccountName: editData.bankAccountName || '',
+        bankCardNumber: editData.bankCardNumber || '',
+        bankName: editData.bankName || '',
+        participants: editData.participants ?? 0,
+        validFrom: editData.validFrom || '',
+        validUntil: editData.validUntil || '',
+      };
+      const uploadedImages = editData.images || [];
+      const imageFileIDs = editData.images || [];
 
       return {
         isEditing: true,
         editData,
-        publishType,
         groupForm,
-        transferForm,
-        secondhandForm,
-        jobForm,
         uploadedImages,
         imageFileIDs,
       };
@@ -288,35 +206,13 @@ Page({
 
   // 输入处理
   onInput(e) {
-    const { field, type } = e.currentTarget.dataset;
+    const { field } = e.currentTarget.dataset;
     let value = e.detail.value;
     // 描述和温馨提示限制 999 字
     if ((field === 'description' || field === 'tips') && value.length > 999) {
       value = value.slice(0, 999);
     }
-    
-    switch (type) {
-      case 'group':
-        this.setData({
-          [`groupForm.${field}`]: value
-        });
-        break;
-      case 'transfer':
-        this.setData({
-          [`transferForm.${field}`]: value
-        });
-        break;
-      case 'secondhand':
-        this.setData({
-          [`secondhandForm.${field}`]: value
-        });
-        break;
-      case 'job':
-        this.setData({
-          [`jobForm.${field}`]: value
-        });
-        break;
-    }
+    this.setData({ [`groupForm.${field}`]: value });
   },
 
   // 切换开关
@@ -419,30 +315,19 @@ Page({
     wx.hideLoading();
   },
 
-  // 地图选点 - 停车场位置
+  // 地图选点
   onChooseLocation() {
-    const { publishType, transferForm, groupForm } = this.data;
-    const isGroup = publishType === 'group';
-    const currentLat = isGroup ? groupForm.locationLat : transferForm.parkingLat;
-    const currentLng = isGroup ? groupForm.locationLng : transferForm.parkingLng;
-    // 默认定位到深圳南山（如果没有已选坐标）
-    const params = {
-      latitude: currentLat || 22.5431,
-      longitude: currentLng || 113.9296,
-    };
+    const { groupForm } = this.data;
     wx.chooseLocation({
-      ...params,
+      latitude: groupForm.locationLat || 22.5431,
+      longitude: groupForm.locationLng || 113.9296,
       success: (res) => {
-        const prefix = isGroup ? 'groupForm' : 'transferForm';
-        const fieldMap = isGroup
-          ? { name: 'locationName', address: 'locationAddress', lat: 'locationLat', lng: 'locationLng', full: 'location' }
-          : { name: 'parkingName', address: 'parkingAddress', lat: 'parkingLat', lng: 'parkingLng', full: 'parkingLot' };
         this.setData({
-          [`${prefix}.${fieldMap.full}`]: isGroup ? res.name : res.address,
-          [`${prefix}.${fieldMap.name}`]: res.name,
-          [`${prefix}.${fieldMap.address}`]: res.address,
-          [`${prefix}.${fieldMap.lat}`]: res.latitude,
-          [`${prefix}.${fieldMap.lng}`]: res.longitude,
+          'groupForm.location': res.address,
+          'groupForm.locationName': res.name,
+          'groupForm.locationAddress': res.address,
+          'groupForm.locationLat': res.latitude,
+          'groupForm.locationLng': res.longitude,
         });
       },
       fail: (err) => {
@@ -453,12 +338,10 @@ Page({
     });
   },
 
-  // 日期选择 - 起止日期
+  // 日期选择
   onDateChange(e) {
-    const { field, type } = e.currentTarget.dataset;
-    const value = e.detail.value;
-    const prefix = type || 'transfer';
-    this.setData({ [`${prefix}Form.${field}`]: value });
+    const { field } = e.currentTarget.dataset;
+    this.setData({ [`groupForm.${field}`]: e.detail.value });
   },
 
   // 上传图片
@@ -508,52 +391,25 @@ Page({
     });
   },
 
-  // 获取当前表单数据
+  // 获取表单数据
   getCurrentFormData() {
-    const { publishType, groupForm, transferForm, secondhandForm, jobForm, imageFileIDs } = this.data;
-    let formData = {};
-    if (publishType === 'group') {
-      // 从完整地址中提取省市区作为 region
-      const fullAddress = groupForm.locationAddress || groupForm.location || '';
-      let region = '';
-      if (fullAddress) {
-        const parts = fullAddress.match(/(.+?省)?(.+?市)?(.+?[区县])?/);
-        if (parts) {
-          region = [parts[1], parts[2], parts[3]].filter(Boolean).join('');
-        }
+    const { groupForm, imageFileIDs, isEditing } = this.data;
+    // 从完整地址中提取省市区作为 region
+    const fullAddress = groupForm.locationAddress || groupForm.location || '';
+    let region = '';
+    if (fullAddress) {
+      const parts = fullAddress.match(/(.+?省)?(.+?市)?(.+?[区县])?/);
+      if (parts) {
+        region = [parts[1], parts[2], parts[3]].filter(Boolean).join('');
       }
-      formData = {
-        ...groupForm,
-        location: fullAddress,
-        region: region,
-        participants: this.data.isEditing ? (groupForm.participants ?? 0) : 0,
-        targetMonths: Number(groupForm.targetMonths) || 0,
-      };
-    } else     if (publishType === 'transfer') {
-      // 从完整地址中提取省市区作为 region
-      const fullAddress = transferForm.parkingAddress || transferForm.parkingLot || '';
-      // 地址格式通常为 "广东省深圳市南山区xxx"，取前三级
-      let region = '';
-      if (fullAddress) {
-        const parts = fullAddress.match(/(.+?省)?(.+?市)?(.+?[区县])?/);
-        if (parts) {
-          region = [parts[1], parts[2], parts[3]].filter(Boolean).join('');
-        }
-      }
-      formData = {
-        ...transferForm,
-        location: fullAddress,
-        parkingLot: transferForm.parkingName || '',
-        region: region,
-      };
-    } else if (publishType === 'secondhand') {
-      formData = { ...secondhandForm };
-    } else if (publishType === 'job') {
-      formData = { ...jobForm, salary: jobForm.salary || '', category: jobForm.jobType };
     }
     return {
-      ...formData,
-      type: publishType,
+      ...groupForm,
+      type: 'group',
+      location: fullAddress,
+      region: region,
+      participants: isEditing ? (groupForm.participants ?? 0) : 0,
+      targetMonths: Number(groupForm.targetMonths) || 0,
       images: imageFileIDs,
       status: 'active',
       styleIndex: Math.floor(Math.random() * 7),
@@ -565,80 +421,46 @@ Page({
   async onPublish() {
     if (this.data.isSubmitting) return;
 
-    const { publishType, transferForm, groupForm } = this.data;
+    const { groupForm } = this.data;
 
-    // 拼团活动必填校验
-    if (publishType === 'group') {
-      if (!groupForm.title || !String(groupForm.title).trim()) {
-        wx.showToast({ title: '请输入活动标题', icon: 'none' });
-        return;
-      }
-      if (!groupForm.location || !String(groupForm.location).trim()) {
-        wx.showToast({ title: '请选择活动地点', icon: 'none' });
-        return;
-      }
-      if (!groupForm.targetMonths && groupForm.targetMonths !== 0) {
-        wx.showToast({ title: '请输入目标张数', icon: 'none' });
-        return;
-      }
-      if (!groupForm.groupPrice && groupForm.groupPrice !== 0) {
-        wx.showToast({ title: '请输入自驾里程', icon: 'none' });
-        return;
-      }
-      if (!groupForm.originalPrice && groupForm.originalPrice !== 0) {
-        wx.showToast({ title: '请输入原定里程', icon: 'none' });
-        return;
-      }
-      if (!groupForm.description || groupForm.description.trim().length < 12) {
-        wx.showToast({ title: '详细描述至少12个字', icon: 'none' });
-        return;
-      }
-      if (!groupForm.validFrom) {
-        wx.showToast({ title: '请选择起始日期', icon: 'none' });
-        return;
-      }
-      if (!groupForm.validUntil) {
-        wx.showToast({ title: '请选择截止日期', icon: 'none' });
-        return;
-      }
-      // 截止日期 ≤ 今天 且 活动状态为"进行中"时，不允许保存
-      const todayStr = new Date().toISOString().slice(0, 10);
-      if (groupForm.validUntil <= todayStr && !groupForm.isClosed) {
-        wx.showToast({ title: '截止日期不能早于今天，请修改日期或将活动状态改为"已截止"', icon: 'none', duration: 2000 });
-        return;
-      }
-    } else if (publishType === 'transfer') {
-      if (!transferForm.title || !transferForm.title.trim()) {
-        wx.showToast({ title: '请输入标题', icon: 'none' });
-        return;
-      }
-      if (!transferForm.price || !transferForm.price.trim()) {
-        wx.showToast({ title: '请输入转让价格', icon: 'none' });
-        return;
-      }
-      if (!transferForm.parkingLot || !transferForm.parkingLot.trim()) {
-        wx.showToast({ title: '请选择停车场位置', icon: 'none' });
-        return;
-      }
-      if (!transferForm.validFrom) {
-        wx.showToast({ title: '请选择起始日期', icon: 'none' });
-        return;
-      }
-      if (!transferForm.validUntil) {
-        wx.showToast({ title: '请选择截止日期', icon: 'none' });
-        return;
-      }
-      if (!transferForm.description || transferForm.description.trim().length < 12) {
-        wx.showToast({ title: '详细描述至少12个字', icon: 'none' });
-        return;
-      }
-    } else {
-      // 其他类型：至少校验标题
-      const formData = this.getCurrentFormData();
-      if (!formData.title || !formData.title.trim()) {
-        wx.showToast({ title: '请输入标题', icon: 'none' });
-        return;
-      }
+    // 必填校验
+    if (!groupForm.title || !String(groupForm.title).trim()) {
+      wx.showToast({ title: '请输入活动标题', icon: 'none' });
+      return;
+    }
+    if (!groupForm.location || !String(groupForm.location).trim()) {
+      wx.showToast({ title: '请选择活动地点', icon: 'none' });
+      return;
+    }
+    if (!groupForm.targetMonths && groupForm.targetMonths !== 0) {
+      wx.showToast({ title: '请输入目标张数', icon: 'none' });
+      return;
+    }
+    if (!groupForm.groupPrice && groupForm.groupPrice !== 0) {
+      wx.showToast({ title: '请输入自驾里程', icon: 'none' });
+      return;
+    }
+    if (!groupForm.originalPrice && groupForm.originalPrice !== 0) {
+      wx.showToast({ title: '请输入原定里程', icon: 'none' });
+      return;
+    }
+    if (!groupForm.description || groupForm.description.trim().length < 12) {
+      wx.showToast({ title: '详细描述至少12个字', icon: 'none' });
+      return;
+    }
+    if (!groupForm.validFrom) {
+      wx.showToast({ title: '请选择起始日期', icon: 'none' });
+      return;
+    }
+    if (!groupForm.validUntil) {
+      wx.showToast({ title: '请选择截止日期', icon: 'none' });
+      return;
+    }
+    // 截止日期 ≤ 今天 且 活动状态为"进行中"时，不允许保存
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (groupForm.validUntil <= todayStr && !groupForm.isClosed) {
+      wx.showToast({ title: '截止日期不能早于今天，请修改日期或将活动状态改为"已截止"', icon: 'none', duration: 2000 });
+      return;
     }
 
     this.setData({ isSubmitting: true });

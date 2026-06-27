@@ -36,7 +36,7 @@
   },
   "permission": {
     "scope.userLocation": {
-      "desc": "你的位置信息将用于查找附近的停车场"
+      "desc": "你的位置信息将用于查找附近的活动"
     }
   },
   "requiredPrivateInfos": ["chooseLocation"],

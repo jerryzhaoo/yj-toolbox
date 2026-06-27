@@ -113,7 +113,7 @@ Page({
     const list = [];
     if (!post) return list;
     if (post.type === 'transfer') {
-      if (post.parkingLot || post.parkingAddress) list.push({ key: '停车场', value: post.parkingLot || post.parkingAddress });
+      if (post.parkingLot || post.parkingAddress) list.push({ key: '活动地点', value: post.parkingLot || post.parkingAddress });
     } else if (post.type === 'secondhand') {
       if (post.price) list.push({ key: '价格', value: `¥${post.price}` });
       if (post.brand) list.push({ key: '品牌', value: post.brand });
