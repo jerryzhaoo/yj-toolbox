@@ -315,7 +315,11 @@ Page({
   onCloseSignUp() { this.setData({ showSignUpModal: false }); },
   onSignInput(e) {
     const { field } = e.currentTarget.dataset;
-    const value = e.detail.value;
+    let value = e.detail.value;
+    // 张数只能输入数字
+    if (field === 'months') {
+      value = value.replace(/\D/g, '');
+    }
     this.setData({ [`signForm.${field}`]: value });
   },
   onClearSignInput(e) {
@@ -458,10 +462,10 @@ Page({
 
   async onSubmitSignUp() {
     const { name, phone, carNumber, months, hasTransfer, voucherUrl, effectDate, needInvoice, companyName, invoiceType, taxNumber, email } = this.data.signForm;
-    if (!name || !name.trim()) { wx.showToast({ title: '请输入姓名', icon: 'none' }); return; }
+    if (!name || name.trim().length < 2) { wx.showToast({ title: '请输入车主姓名（需与车牌绑定）', icon: 'none', duration: 2000 }); return; }
     if (!phone || !phone.trim()) { wx.showToast({ title: '请输入手机号', icon: 'none' }); return; }
     if (!carNumber || !carNumber.trim()) { wx.showToast({ title: '请输入车牌号', icon: 'none' }); return; }
-    if (!months || Number(months) <= 0) { wx.showToast({ title: '请输入张数', icon: 'none' }); return; }
+    if (!months || Number(months) < 2) { wx.showToast({ title: '请调整张数（至少2张）', icon: 'none' }); return; }
     if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传签到凭证', icon: 'none' }); return; }
     if (needInvoice) {
       if (!companyName || !companyName.trim()) { wx.showToast({ title: '请输入公司名称', icon: 'none' }); return; }
@@ -601,7 +605,12 @@ Page({
   onToggleEdit() { this.setData({ viewReadonly: !this.data.viewReadonly }); },
   onViewSignInput(e) {
     const { field } = e.currentTarget.dataset;
-    this.setData({ [`viewSignForm.${field}`]: e.detail.value });
+    let value = e.detail.value;
+    // 张数只能输入数字
+    if (field === 'months') {
+      value = value.replace(/\D/g, '');
+    }
+    this.setData({ [`viewSignForm.${field}`]: value });
   },
   onClearViewSignInput(e) {
     const { field } = e.currentTarget.dataset;
@@ -617,10 +626,10 @@ Page({
 
   async onSubmitViewEdit() {
     const { name, phone, carNumber, months, hasTransfer, voucherUrl, effectDate, needInvoice, companyName, invoiceType, taxNumber, email } = this.data.viewSignForm;
-    if (!name || !name.trim()) { wx.showToast({ title: '请输入姓名', icon: 'none' }); return; }
+    if (!name || name.trim().length < 2) { wx.showToast({ title: '请输入车主姓名（需与车牌绑定）', icon: 'none', duration: 2000 }); return; }
     if (!phone || !phone.trim()) { wx.showToast({ title: '请输入手机号', icon: 'none' }); return; }
     if (!carNumber || !carNumber.trim()) { wx.showToast({ title: '请输入车牌号', icon: 'none' }); return; }
-    if (!months || Number(months) <= 0) { wx.showToast({ title: '请输入张数', icon: 'none' }); return; }
+    if (!months || Number(months) < 2) { wx.showToast({ title: '请调整张数（至少2张）', icon: 'none' }); return; }
     if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传签到凭证', icon: 'none' }); return; }
     if (needInvoice) {
       if (!companyName || !companyName.trim()) { wx.showToast({ title: '请输入公司名称', icon: 'none' }); return; }

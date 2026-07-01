@@ -99,7 +99,7 @@
           <view class="table-header">
             <text class="th" style="width: 14%;">姓名</text>
             <text class="th" style="width: 18%;">车牌号</text>
-            <text class="th" style="width: 10%;">卡数</text>
+            <text class="th" style="width: 10%;">张数</text>
             <text class="th" style="width: 14%;">共计</text>
             <text class="th" style="width: 12%;">确认</text>
             <text class="th" style="width: 16%;">凭证</text>
@@ -238,7 +238,7 @@
         <view class="form-group">
           <text class="form-label"><text class="required-star">*</text>姓名</text>
           <view class="input-wrap">
-            <input name="name" placeholder="请输入您的姓名" class="form-input" value="{{signForm.name}}" data-field="name" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+            <input name="name" placeholder="请输入车主姓名（需与车牌绑定）" class="form-input" value="{{signForm.name}}" data-field="name" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
             <view wx:if="{{focusedField === 'name' && signForm.name}}" class="clear-btn" catchtap="onClearSignInput" data-field="name">✕</view>
           </view>
         </view>
@@ -427,7 +427,7 @@
           <view class="form-group">
           <text class="form-label"><text class="required-star">*</text>姓名</text>
           <view class="input-wrap">
-            <input name="name" placeholder="请输入姓名" class="form-input" value="{{viewSignForm.name}}" data-field="name" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+            <input name="name" placeholder="车主姓名（需与车牌绑定）" class="form-input" value="{{viewSignForm.name}}" data-field="name" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
             <view wx:if="{{focusedField === 'name' && !viewReadonly && viewSignForm.name}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="name">✕</view>
           </view>
         </view>

@@ -102,12 +102,12 @@
     </view>
     
     <view class="form-row">
-      <text class="form-label">真实姓名</text>
+      <text class="form-label">车主姓名</text>
       <block wx:if="{{isEditing}}">
         <input 
           class="form-input" 
           type="text"
-          placeholder="请输入真实姓名"
+          placeholder="请输入车主姓名"
           value="{{formData.realName}}"
           data-field="realName"
           bindinput="onInput"

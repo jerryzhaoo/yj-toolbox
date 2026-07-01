@@ -11,7 +11,7 @@ const FIELD_PURPOSES = [
   { key: 'avatar',   label: '头像',       purpose: '在活动报名列表中展示个人形象，方便拼友识别' },
   { key: 'name',     label: '昵称',       purpose: '在活动中标识您的身份，让拼友知道如何称呼您' },
   { key: 'gender',   label: '性别',       purpose: '活动分组匹配及个性化服务' },
-  { key: 'realName', label: '真实姓名',   purpose: '活动报名实名登记，确保参与者身份真实性' },
+  { key: 'realName', label: '车主姓名',   purpose: '活动报名实名登记，确保参与者身份真实性' },
   { key: 'phone',    label: '手机号',     purpose: '活动联系、紧急通知以及拼友之间联系' },
   { key: 'carNumber',label: '车牌号',     purpose: '活动签到识别、活动安排及拼团匹配' },
   { key: 'wechat',   label: '微信号',     purpose: '拼友之间互相添加微信进行沟通协调' },
