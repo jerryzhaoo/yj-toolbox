@@ -193,15 +193,6 @@ Page({
         displayBankCardNumber: this.maskCardNumber(activity.bankCardNumber),
         displayBankName: this.maskBankName(activity.bankName),
       });
-
-      // 同步回写活动表 currentMonths，保证首页卡片显示与详情一致
-      try {
-        await db.collection('activities').doc(activityId).update({
-          data: { currentMonths, updatedAt: db.serverDate() },
-        });
-      } catch (e) {
-        console.warn('同步活动当前报名数失败:', e);
-      }
     } catch (err) {
       console.error('加载活动详情失败:', err);
     }
@@ -504,10 +495,16 @@ Page({
         taxNumber: needInvoice ? taxNumber.trim() : '',
         email: needInvoice ? email.trim() : '',
       };
+      let signUpId = mySignUpId;
+      let monthsDiff = Number(months); // 新增时diff为正数
+
       if (mySignUpId) {
+        // 更新已有记录
         await db.collection('participants').doc(mySignUpId).update({
-          data: { ...payload, modifiedBy: this.data.currentUserId, updatedAt: db.serverDate() },
+          data: { ...payload, modifiedBy: currentUserId, updatedAt: db.serverDate() },
         });
+        // 增量更新currentMonths（新张数 - 旧张数）
+        monthsDiff = Number(months) - (this.data.participants.find(p => p._id === mySignUpId)?.months || 0);
       } else {
         // 实时检查是否已报名，防止重复添加
         const existRes = await db.collection('participants').where({
@@ -515,33 +512,34 @@ Page({
           _openid: currentUserId,
         }).limit(1).get();
         if (existRes.data && existRes.data.length > 0) {
-          // 已存在记录，改为更新
           const existId = existRes.data[0]._id;
+          monthsDiff = Number(months) - (existRes.data[0].months || 0);
           await db.collection('participants').doc(existId).update({
-            data: { ...payload, modifiedBy: this.data.currentUserId, updatedAt: db.serverDate() },
+            data: { ...payload, modifiedBy: currentUserId, updatedAt: db.serverDate() },
           });
+          signUpId = existId;
           this.setData({ mySignUpId: existId });
         } else {
-          await db.collection('participants').add({
+          const addRes = await db.collection('participants').add({
             data: { ...payload, activityId, createdAt: db.serverDate() },
           });
+          signUpId = addRes._id;
+          this.setData({ mySignUpId: signUpId });
         }
       }
-      this.setData({ showSignUpModal: false, showSuccessModal: true });
 
-      // 重新查询最新 participants 并直接更新活动表的 currentMonths
-      try {
-        const partRes = await wx.cloud.callFunction({ name: 'getParticipants', data: { activityId } });
-        const participants = (partRes.result && partRes.result.data) || [];
-        const currentMonths = participants.reduce((sum, p) => sum + (Number(p.months) || 0), 0);
-        await db.collection('activities').doc(activityId).update({
-          data: { currentMonths, updatedAt: db.serverDate() },
-        });
-        this.setData({ currentMonths });
-      } catch (e) {
-        console.warn('同步活动报名数失败:', e);
+      // 增量更新活动报名张数
+      if (monthsDiff !== 0) {
+        try {
+          await db.collection('activities').doc(activityId).update({
+            data: { currentMonths: db.command.inc(monthsDiff) },
+          });
+        } catch (e) {
+          console.warn('更新活动报名数失败:', e);
+        }
       }
 
+      this.setData({ showSignUpModal: false, showSuccessModal: true });
       this.loadActivity(this.data.activityId);
     } catch (err) {
       console.error('报名失败:', err);
@@ -556,7 +554,14 @@ Page({
       success: async (res) => {
         if (res.confirm) {
           try {
+            const myRecord = this.data.participants.find(p => p._id === this.data.mySignUpId);
+            const monthsToDec = myRecord ? Number(myRecord.months) || 0 : 0;
             await db.collection('participants').doc(this.data.mySignUpId).remove();
+            if (monthsToDec > 0) {
+              await db.collection('activities').doc(this.data.activityId).update({
+                data: { currentMonths: db.command.inc(-monthsToDec) },
+              });
+            }
             wx.showToast({ title: '已取消报名', icon: 'success' });
             this.loadActivity(this.data.activityId);
           } catch (err) {
