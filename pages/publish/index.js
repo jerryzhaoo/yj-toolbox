@@ -408,6 +408,7 @@ Page({
       type: 'group',
       location: fullAddress,
       region: region,
+      currentMonths: isEditing ? (groupForm.currentMonths ?? 0) : 0,
       participants: isEditing ? (groupForm.participants ?? 0) : 0,
       targetMonths: Number(groupForm.targetMonths) || 0,
       images: imageFileIDs,
