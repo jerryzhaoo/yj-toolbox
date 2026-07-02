@@ -26,23 +26,11 @@ exports.main = async (event) => {
       templateId: TEMPLATE_ID,
     }).get()
 
-    console.log('[调试] subscribers查到了', subscribers.data.length, '条')
-    if (subscribers.data.length > 0) {
-      console.log('[调试] 第一条完整数据:', JSON.stringify(subscribers.data[0]))
-      console.log('[调试] 第一个_openid:', subscribers.data[0]._openid)
-    }
-
     // 查该活动的参与者
     const allParticipants = await db.collection('participants').where({
       activityId,
       hasTransfer: false,
     }).limit(500).get()
-
-    console.log('[调试] participants(未转账)查到了', allParticipants.data.length, '条')
-    if (allParticipants.data.length > 0) {
-      console.log('[调试] 第一条参与者_openid:', allParticipants.data[0]._openid)
-      console.log('[调试] allParticipants._openid:', JSON.stringify(allParticipants.data.map(p => p._openid)))
-    }
 
     // 获取活动收款信息
     const activityRes = await db.collection('activities').doc(activityId).get()
@@ -60,10 +48,7 @@ exports.main = async (event) => {
       }).limit(1).get()
 
       const participant = participantRes.data[0]
-      if (!participant) {
-        console.log('[调试] 订阅者', sub._openid, '未匹配到未转账参与者，跳过')
-        continue
-      }
+      if (!participant) continue
 
       try {
         await cloud.openapi.subscribeMessage.send({

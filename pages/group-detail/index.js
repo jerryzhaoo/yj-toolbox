@@ -118,7 +118,6 @@ Page({
         if (!!a.hasTransfer !== !!b.hasTransfer) return a.hasTransfer ? 1 : -1;
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       });
-      console.log('[调试] 数据库返回participants条数:', participantsData.length, '| activityId:', id);
       const voucherUrls = participants.map(p => p.voucherUrl).filter(Boolean);
       if (voucherUrls.length > 0) {
         try {
