@@ -94,7 +94,7 @@ Page({
         : [];
 
       const [partRes, adminRes] = await Promise.all([
-        db.collection('participants').where({ activityId: id }).get(),
+        wx.cloud.callFunction({ name: 'getParticipants', data: { activityId: id } }),
         openid ? (() => {
           // 先查缓存
           const cached = app.getAdminCache(openid);
@@ -113,10 +113,12 @@ Page({
           });
         })() : Promise.resolve({ data: [] })
       ]);
-      const participants = (partRes.data || []).sort((a, b) => {
+      const participantsData = (partRes.result && partRes.result.data) || [];
+      const participants = participantsData.sort((a, b) => {
         if (!!a.hasTransfer !== !!b.hasTransfer) return a.hasTransfer ? 1 : -1;
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       });
+      console.log('[调试] 数据库返回participants条数:', participantsData.length, '| activityId:', id);
       const voucherUrls = participants.map(p => p.voucherUrl).filter(Boolean);
       if (voucherUrls.length > 0) {
         try {
@@ -210,8 +212,8 @@ Page({
 
   async loadParticipants(activityId) {
     try {
-      const res = await db.collection('participants').where({ activityId }).get();
-      const participants = (res.data || []).sort((a, b) => {
+      const res = await wx.cloud.callFunction({ name: 'getParticipants', data: { activityId } });
+      const participants = ((res.result && res.result.data) || []).sort((a, b) => {
         if (!!a.hasTransfer !== !!b.hasTransfer) return a.hasTransfer ? 1 : -1;
         return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       });
@@ -281,22 +283,32 @@ Page({
     } catch (e) {}
 
     if (myRecord) {
-      this.setData({ 
-        showSignUpModal: true,
-        signForm: {
-          name: myRecord.name || '',
-          phone: myRecord.phone || '',
-          carNumber: myRecord.carNumber || '',
-          months: String(myRecord.months || ''),
-          hasTransfer: !!myRecord.hasTransfer,
-          voucherUrl: myRecord.voucherUrl || '',
-          effectDate: myRecord.effectDate || '',
-          needInvoice: myRecord.needInvoice !== undefined ? !!myRecord.needInvoice : presetInvoice.needInvoice,
-          companyName: myRecord.companyName || presetInvoice.companyName,
-          invoiceType: myRecord.invoiceType || presetInvoice.invoiceType,
-          taxNumber: myRecord.taxNumber || presetInvoice.taxNumber,
-          email: myRecord.email || presetInvoice.email,
-        }
+      wx.showModal({
+        title: '您已报名',
+        content: '您已报名此活动，本次打开将修改您的报名信息。',
+        confirmText: '修改信息',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            this.setData({
+              showSignUpModal: true,
+              signForm: {
+                name: myRecord.name || '',
+                phone: myRecord.phone || '',
+                carNumber: myRecord.carNumber || '',
+                months: String(myRecord.months || ''),
+                hasTransfer: !!myRecord.hasTransfer,
+                voucherUrl: myRecord.voucherUrl || '',
+                effectDate: myRecord.effectDate || '',
+                needInvoice: myRecord.needInvoice !== undefined ? !!myRecord.needInvoice : presetInvoice.needInvoice,
+                companyName: myRecord.companyName || presetInvoice.companyName,
+                invoiceType: myRecord.invoiceType || presetInvoice.invoiceType,
+                taxNumber: myRecord.taxNumber || presetInvoice.taxNumber,
+                email: myRecord.email || presetInvoice.email,
+              },
+            });
+          }
+        },
       });
     } else {
       this.setData({
@@ -307,7 +319,7 @@ Page({
           effectDate: '',
           needInvoice: false,
           companyName: '', invoiceType: '普票', taxNumber: '', email: '',
-        }
+        },
       });
     }
   },
@@ -472,7 +484,7 @@ Page({
       if (!email || !email.trim()) { wx.showToast({ title: '请输入接收邮箱', icon: 'none' }); return; }
     }
     try {
-      const { mySignUpId } = this.data;
+      const { mySignUpId, currentUserId, activityId } = this.data;
       const payload = {
         name: name.trim(), phone: phone.trim(),
         carNumber: carNumber.trim().toUpperCase(), months: Number(months),
@@ -488,9 +500,23 @@ Page({
           data: { ...payload, modifiedBy: this.data.currentUserId, updatedAt: db.serverDate() },
         });
       } else {
-        await db.collection('participants').add({
-          data: { ...payload, activityId: this.data.activityId, createdAt: db.serverDate() },
-        });
+        // 实时检查是否已报名，防止重复添加
+        const existRes = await db.collection('participants').where({
+          activityId,
+          _openid: currentUserId,
+        }).limit(1).get();
+        if (existRes.data && existRes.data.length > 0) {
+          // 已存在记录，改为更新
+          const existId = existRes.data[0]._id;
+          await db.collection('participants').doc(existId).update({
+            data: { ...payload, modifiedBy: this.data.currentUserId, updatedAt: db.serverDate() },
+          });
+          this.setData({ mySignUpId: existId });
+        } else {
+          await db.collection('participants').add({
+            data: { ...payload, activityId, createdAt: db.serverDate() },
+          });
+        }
       }
       this.setData({ showSignUpModal: false, showSuccessModal: true });
       this.loadActivity(this.data.activityId);

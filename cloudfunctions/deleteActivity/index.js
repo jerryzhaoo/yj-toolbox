@@ -27,7 +27,7 @@ exports.main = async (event) => {
     // 删除活动
     await db.collection('activities').doc(activityId).remove();
     // 删除该活动下所有参与者
-    const partRes = await db.collection('participants').where({ activityId }).get();
+    const partRes = await db.collection('participants').where({ activityId }).limit(500).get();
     const tasks = partRes.data.map(p => db.collection('participants').doc(p._id).remove());
     await Promise.all(tasks);
     return { success: true };

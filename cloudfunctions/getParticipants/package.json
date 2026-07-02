@@ -1,0 +1,9 @@
+{
+  "name": "getParticipants",
+  "version": "1.0.0",
+  "description": "获取活动参与者列表（无20条限制）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

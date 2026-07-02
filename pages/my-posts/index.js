@@ -47,7 +47,7 @@ Page({
         const res = await db.collection('activities').where({ _openid: openid }).orderBy('createdAt', 'desc').get();
         postsData = res.data;
       } else if (type === 'joined') {
-        const partRes = await db.collection('participants').where({ _openid: openid }).get();
+        const partRes = await db.collection('participants').where({ _openid: openid }).limit(500).get();
         const activityIds = partRes.data.map(p => p.activityId);
         if (activityIds.length > 0) {
           const res = await db.collection('activities').where({ _id: db.command.in(activityIds) }).get();

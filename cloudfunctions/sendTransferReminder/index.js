@@ -36,7 +36,7 @@ exports.main = async (event) => {
     const allParticipants = await db.collection('participants').where({
       activityId,
       hasTransfer: false,
-    }).get()
+    }).limit(500).get()
 
     console.log('[调试] participants(未转账)查到了', allParticipants.data.length, '条')
     if (allParticipants.data.length > 0) {

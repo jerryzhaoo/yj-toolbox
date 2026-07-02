@@ -86,7 +86,7 @@ Page({
       if (groupIds.length > 0) {
         const partRes = await db.collection('participants').where({
           activityId: db.command.in(groupIds)
-        }).get();
+        }).limit(500).get();
         for (const p of partRes.data || []) {
           participantSums[p.activityId] = (participantSums[p.activityId] || 0) + (Number(p.months) || 0);
         }
