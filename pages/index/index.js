@@ -80,17 +80,7 @@ Page({
       if (this.data.sortBy === '综合') {
         transferData = this.shuffleArray([...transferData]);
       }
-      // 查询每个拼团活动的参与者月数总和
-      const groupIds = groupRes.data.map(item => item._id);
-      const participantSums = {};
-      if (groupIds.length > 0) {
-        const partRes = await db.collection('participants').where({
-          activityId: db.command.in(groupIds)
-        }).limit(500).get();
-        for (const p of partRes.data || []) {
-          participantSums[p.activityId] = (participantSums[p.activityId] || 0) + (Number(p.months) || 0);
-        }
-      }
+      // 直接使用活动表里的 currentMonths 字段，不再查 participants 集合
       let groupData = groupRes.data.map((item, i) => {
         const expired = item.isClosed;
         const dateExpired = !expired && item.validUntil && toDateStr(item.validUntil) <= todayStr;
@@ -102,7 +92,7 @@ Page({
           ...item,
           isExpired,
           styleIndex: item.styleIndex ?? (i % 7),
-          currentMonths: participantSums[item._id] || 0,
+          currentMonths: item.currentMonths || 0,
         };
       });
       // 排序：未截止在前，已截止在后，各自按 createdAt 倒序
