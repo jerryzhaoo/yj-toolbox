@@ -530,6 +530,20 @@ Page({
         }
       }
       this.setData({ showSignUpModal: false, showSuccessModal: true });
+
+      // 重新查询最新 participants 并直接更新活动表的 currentMonths
+      try {
+        const partRes = await wx.cloud.callFunction({ name: 'getParticipants', data: { activityId } });
+        const participants = (partRes.result && partRes.result.data) || [];
+        const currentMonths = participants.reduce((sum, p) => sum + (Number(p.months) || 0), 0);
+        await db.collection('activities').doc(activityId).update({
+          data: { currentMonths, updatedAt: db.serverDate() },
+        });
+        this.setData({ currentMonths });
+      } catch (e) {
+        console.warn('同步活动报名数失败:', e);
+      }
+
       this.loadActivity(this.data.activityId);
     } catch (err) {
       console.error('报名失败:', err);
