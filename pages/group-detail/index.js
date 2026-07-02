@@ -195,14 +195,12 @@ Page({
       });
 
       // 同步回写活动表 currentMonths，保证首页卡片显示与详情一致
-      if ((activity.currentMonths || 0) !== currentMonths) {
-        try {
-          await db.collection('activities').doc(activityId).update({
-            data: { currentMonths, updatedAt: db.serverDate() },
-          });
-        } catch (e) {
-          console.warn('同步活动当前报名数失败:', e);
-        }
+      try {
+        await db.collection('activities').doc(activityId).update({
+          data: { currentMonths, updatedAt: db.serverDate() },
+        });
+      } catch (e) {
+        console.warn('同步活动当前报名数失败:', e);
       }
     } catch (err) {
       console.error('加载活动详情失败:', err);
