@@ -27,7 +27,20 @@ exports.main = async (event, context) => {
       return { success: false, msg: '无权限操作' }
     }
 
-    await db.collection('participants').doc(participantId).remove()
+    // 先查旧记录，获取 activityId 和 months
+    const old = await db.collection('participants').doc(participantId).get();
+    const activityId = old.data ? old.data.activityId : null;
+    const oldMonths = old.data ? (Number(old.data.months) || 0) : 0;
+
+    await db.collection('participants').doc(participantId).remove();
+
+    // 同步扣减 currentMonths
+    if (oldMonths > 0 && activityId) {
+      await db.collection('activities').doc(activityId).update({
+        data: { currentMonths: db.command.inc(-oldMonths) }
+      });
+    }
+
     return { success: true, msg: '删除成功' }
   } catch (err) {
     console.error('[deleteParticipant] 错误:', err)

@@ -16,8 +16,24 @@ exports.main = async (event) => {
   }
 
   try {
+    // 先查旧记录，获取 activityId 和旧 months
+    const old = await db.collection('participants').doc(participantId).get();
+    if (!old.data) return { success: false, msg: '参与者不存在' };
+    const activityId = old.data.activityId;
+    const oldMonths = Number(old.data.months) || 0;
+    const newMonths = (data.months !== undefined) ? Number(data.months) || 0 : oldMonths;
+
     data.updatedAt = db.serverDate();
     await db.collection('participants').doc(participantId).update({ data });
+
+    // 增量同步 currentMonths
+    const monthsDiff = newMonths - oldMonths;
+    if (monthsDiff !== 0 && activityId) {
+      await db.collection('activities').doc(activityId).update({
+        data: { currentMonths: db.command.inc(monthsDiff) }
+      });
+    }
+
     return { success: true };
   } catch (err) {
     return { success: false, msg: err.message };
