@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>马年32批月卡拼团_报名表_1783438731780 - 下载凭证图片</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f5f5; padding: 20px; }
+h1 { font-size: 18px; margin-bottom: 4px; }
+.sub { color: #999; font-size: 13px; margin-bottom: 16px; }
+.toolbar { position: sticky; top: 10px; z-index: 10; background: #fff; padding: 12px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.toolbar button { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+.btn-all { background: #07c160; color: #fff; }
+.btn-all:hover { background: #06ad56; }
+.progress { position: sticky; top: 10px; z-index: 10; background: #fff; padding: 10px 16px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.1); margin-bottom: 16px; display: none; }
+.progress .bar { height: 6px; background: #e0e0e0; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.progress .bar-inner { height: 100%; background: #07c160; border-radius: 3px; transition: width .3s; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.08); transition: box-shadow .2s; }
+.card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.15); }
+.card img { width: 100%; height: 150px; object-fit: cover; display: block; background: #eee; }
+.card-info { padding: 8px 10px; }
+.card-name { font-size: 13px; font-weight: bold; word-break: break-all; }
+.card-status { font-size: 12px; margin-top: 2px; }
+.status-ok { color: #07c160; }
+.status-pending { color: #999; }
+.download { float: right; color: #07c160; text-decoration: none; font-size: 13px; }
+.download:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<h1>马年32批月卡拼团_报名表_1783438731780</h1>
+<div class="sub">共 38 张凭证图片 · 已下载到本地</div>
+
+<div class="toolbar" id="toolbar">
+  <button class="btn-all" onclick="downloadAll()">下载全部 (38 张)</button>
+</div>
+
+<div class="progress" id="progress">
+  <span id="progressText">准备中...</span>
+  <div class="bar"><div class="bar-inner" id="progressBar" style="width:0%"></div></div>
+</div>
+
+<div class="grid" id="grid">
+</div>
+
+<script>
+const items = [
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/金斗光_粤B5XB18_2_1020.00.jpg", "name": "金斗光", "carNumber": "粤B5XB18", "months": "2", "amount": "1020.00", "idx": 3 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/吴文迪_粤BGS2696_4_2040.00.jpg", "name": "吴文迪", "carNumber": "粤BGS2696", "months": "4", "amount": "2040.00", "idx": 4 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/曾勇_粤BGU9313_2_1020.00.jpg", "name": "曾勇", "carNumber": "粤BGU9313", "months": "2", "amount": "1020.00", "idx": 5 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/张浩程_粤BHC4090_2_1020.00.jpg", "name": "张浩程", "carNumber": "粤BHC4090", "months": "2", "amount": "1020.00", "idx": 6 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/陈伟忠_粤BBT7756_2_1020.00.jpg", "name": "陈伟忠", "carNumber": "粤BBT7756", "months": "2", "amount": "1020.00", "idx": 7 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/李思毅_粤B08KS6_2_1020.00.jpg", "name": "李思毅", "carNumber": "粤B08KS6", "months": "2", "amount": "1020.00", "idx": 8 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/蔡龙江_粤BHC2129_2_1020.00.jpg", "name": "蔡龙江", "carNumber": "粤BHC2129", "months": "2", "amount": "1020.00", "idx": 9 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/费娜_粤BAK0996_2_1020.00.jpg", "name": "费娜", "carNumber": "粤BAK0996", "months": "2", "amount": "1020.00", "idx": 10 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/郑翔宇_粤BC07728_2_1020.00.jpg", "name": "郑翔宇", "carNumber": "粤BC07728", "months": "2", "amount": "1020.00", "idx": 11 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/陈雁泽_粤BEE2805_2_1020.00.jpg", "name": "陈雁泽", "carNumber": "粤BEE2805", "months": "2", "amount": "1020.00", "idx": 12 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/田旭言_粤BCS7188_4_2040.00.jpg", "name": "田旭言", "carNumber": "粤BCS7188", "months": "4", "amount": "2040.00", "idx": 13 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/李厚兵_粤LH0B68_3_1530.00.jpg", "name": "李厚兵", "carNumber": "粤LH0B68", "months": "3", "amount": "1530.00", "idx": 14 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/覃伟_粤BE08698_2_1020.00.jpg", "name": "覃伟", "carNumber": "粤BE08698", "months": "2", "amount": "1020.00", "idx": 15 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/谭雅文_粤BGK7419_4_2040.00.jpg", "name": "谭雅文", "carNumber": "粤BGK7419", "months": "4", "amount": "2040.00", "idx": 16 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/蔡琨_粤BCK3512_2_1020.00.jpg", "name": "蔡琨", "carNumber": "粤BCK3512", "months": "2", "amount": "1020.00", "idx": 17 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/敖靖宜_粤LX930N_3_1530.00.jpg", "name": "敖靖宜", "carNumber": "粤LX930N", "months": "3", "amount": "1530.00", "idx": 18 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/王凯_粤B5796A_2_1020.00.jpg", "name": "王凯", "carNumber": "粤B5796A", "months": "2", "amount": "1020.00", "idx": 19 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/张子威_鄂AAR2966_2_1020.00.jpg", "name": "张子威", "carNumber": "鄂AAR2966", "months": "2", "amount": "1020.00", "idx": 20 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/陈娇玲_粤BB90075_2_1020.00.jpg", "name": "陈娇玲", "carNumber": "粤BB90075", "months": "2", "amount": "1020.00", "idx": 21 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/白冰_粤BCD6345_2_1020.00.jpg", "name": "白冰", "carNumber": "粤BCD6345", "months": "2", "amount": "1020.00", "idx": 22 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/梁富新_粤BU6363_3_1530.00.jpg", "name": "梁富新", "carNumber": "粤BU6363", "months": "3", "amount": "1530.00", "idx": 23 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/朱恺祺_粤 B95E7F_2_1020.00.jpg", "name": "朱恺祺", "carNumber": "粤 B95E7F", "months": "2", "amount": "1020.00", "idx": 24 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/吴志良_粤BAP5029_2_1020.00.jpg", "name": "吴志良", "carNumber": "粤BAP5029", "months": "2", "amount": "1020.00", "idx": 25 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/曹流浪_粤B84M11_2_1020.00.jpg", "name": "曹流浪", "carNumber": "粤B84M11", "months": "2", "amount": "1020.00", "idx": 26 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/梁守志_粤EL81R0_2_1020.00.jpg", "name": "梁守志", "carNumber": "粤EL81R0", "months": "2", "amount": "1020.00", "idx": 27 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/吴浩_粤BAA6096_4_2040.00.jpg", "name": "吴浩", "carNumber": "粤BAA6096", "months": "4", "amount": "2040.00", "idx": 28 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/王卫_粤D24S69_4_2040.00.jpg", "name": "王卫", "carNumber": "粤D24S69", "months": "4", "amount": "2040.00", "idx": 29 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/贺彬彬_粤B5JC76_3_1530.00.jpg", "name": "贺彬彬", "carNumber": "粤B5JC76", "months": "3", "amount": "1530.00", "idx": 30 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/付饶_粤BBX0606_4_2040.00.jpg", "name": "付饶", "carNumber": "粤BBX0606", "months": "4", "amount": "2040.00", "idx": 31 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/彭国林_粤BCY9580_2_1020.00.jpg", "name": "彭国林", "carNumber": "粤BCY9580", "months": "2", "amount": "1020.00", "idx": 32 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/陈文虹_粤B 678JW_4_2040.00.jpg", "name": "陈文虹", "carNumber": "粤B 678JW", "months": "4", "amount": "2040.00", "idx": 33 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/王佳佳_粤B806B6_2_1020.00.jpg", "name": "王佳佳", "carNumber": "粤B806B6", "months": "2", "amount": "1020.00", "idx": 34 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/黄凝_粤BCW6221_6_3060.00.jpg", "name": "黄凝", "carNumber": "粤BCW6221", "months": "6", "amount": "3060.00", "idx": 35 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/周贞贞_粤BCH5432_5_2550.00.jpg", "name": "周贞贞", "carNumber": "粤BCH5432", "months": "5", "amount": "2550.00", "idx": 36 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/刘政_粤BJ64191_2_1020.00.jpg", "name": "刘政", "carNumber": "粤BJ64191", "months": "2", "amount": "1020.00", "idx": 37 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/全文玉_粤BP35999_2_1020.00.jpg", "name": "全文玉", "carNumber": "粤BP35999", "months": "2", "amount": "1020.00", "idx": 38 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/蔡津津_粤BEQ2877_2_1020.00.jpg", "name": "蔡津津", "carNumber": "粤BEQ2877", "months": "2", "amount": "1020.00", "idx": 39 },
+    { "src": "./马年32批月卡拼团_报名表_1783438731780_vouchers/曹乐_粤B95QD6_2_1020.00.jpg", "name": "曹乐", "carNumber": "粤B95QD6", "months": "2", "amount": "1020.00", "idx": 40 }
+];
+
+function buildFileName(item) {
+    var parts = [item.name, item.carNumber, item.months, item.amount].filter(function(v) { return v && v.length > 0; });
+    return (parts.join('_') || 'image').replace(/[\\/:*?"<>|]/g, '_') + '.jpg';
+}
+
+function updateStatus(i, state, msg) {
+    var el = document.getElementById('status' + i);
+    if (el) {
+        el.textContent = msg || (state === 'ok' ? '✓ 已触发下载' : '✗ 失败');
+        el.className = 'card-status status-' + state;
+    }
+}
+
+function downloadViaCanvas(imgId, i) {
+    var img = document.getElementById(imgId);
+    if (!img) return;
+    var canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth || img.width;
+    canvas.height = img.naturalHeight || img.height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    canvas.toBlob(function(blob) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = buildFileName(items[i]);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+    }, 'image/jpeg', 0.95);
+}
+
+function downloadOne(i, callback) {
+    var imgId = 'img' + i;
+    var img = document.getElementById(imgId);
+    if (!img || !img.complete || img.naturalWidth === 0) {
+        updateStatus(i, 'fail', '图片未加载');
+        if (callback) callback();
+        return;
+    }
+    try {
+        downloadViaCanvas(imgId, i);
+        updateStatus(i, 'ok', '✓ 已触发下载');
+    } catch (e) {
+        updateStatus(i, 'fail', '✗ ' + e.message);
+    }
+    if (callback) setTimeout(callback, 200);
+}
+
+function render() {
+    var grid = document.getElementById('grid');
+    grid.innerHTML = items.map(function(item, i) {
+        return '<div class="card" id="card' + i + '">' +
+            '<img id="img' + i + '" src="' + item.src + '" loading="lazy">' +
+            '<div class="card-info">' +
+                '<div class="card-name">#' + (i+1) + ' ' + item.name + '</div>' +
+                '<div class="card-status status-pending" id="status' + i + '">等待下载</div>' +
+                '<a class="download" href="javascript:void(0)" onclick="downloadOne(' + i + ')">单张下载</a>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function downloadAll() {
+    document.getElementById('progress').style.display = 'block';
+    var total = items.length;
+    var idx = 0;
+
+    function next() {
+        if (idx >= total) {
+            document.getElementById('progressText').textContent = '完成! 共 ' + total + ' 张';
+            document.getElementById('progressBar').style.width = '100%';
+            return;
+        }
+        document.getElementById('progressText').textContent = '下载中: ' + (idx+1) + '/' + total + ' - ' + items[idx].name;
+        document.getElementById('progressBar').style.width = ((idx/total)*100) + '%';
+        downloadOne(idx, function() { idx++; next(); });
+    }
+    next();
+}
+
+render();
+</script>
+</body>
+</html>
