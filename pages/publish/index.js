@@ -167,6 +167,7 @@ Page({
         bankCardNumber: editData.bankCardNumber || '',
         bankName: editData.bankName || '',
         participants: editData.participants ?? 0,
+        currentMonths: editData.currentMonths ?? 0,
         validFrom: editData.validFrom || '',
         validUntil: editData.validUntil || '',
       };

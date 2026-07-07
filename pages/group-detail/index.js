@@ -327,9 +327,10 @@ Page({
   onSignInput(e) {
     const { field } = e.currentTarget.dataset;
     let value = e.detail.value;
-    // 张数只能输入数字
+    // 张数只能输入数字，且至少为1
     if (field === 'months') {
       value = value.replace(/\D/g, '');
+      if (value !== '' && Number(value) < 1) value = '1';
     }
     this.setData({ [`signForm.${field}`]: value });
   },
@@ -446,7 +447,7 @@ Page({
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0];
         wx.compressImage({
-          src: tempFilePath, quality: 60,
+          src: tempFilePath, quality: 70, compressedWidth: 800,
           success: (compressRes) => {
             wx.cloud.uploadFile({
               cloudPath: `vouchers/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`,
@@ -476,7 +477,7 @@ Page({
     if (!name || name.trim().length < 2) { wx.showToast({ title: '请输入车主姓名（需与车牌绑定）', icon: 'none', duration: 2000 }); return; }
     if (!phone || !phone.trim()) { wx.showToast({ title: '请输入手机号', icon: 'none' }); return; }
     if (!carNumber || !carNumber.trim()) { wx.showToast({ title: '请输入车牌号', icon: 'none' }); return; }
-    if (!months || Number(months) < 2) { wx.showToast({ title: '请调整张数（至少2张）', icon: 'none' }); return; }
+    if (!months || Number(months) < 1) { wx.showToast({ title: '请调整张数（至少1张）', icon: 'none' }); return; }
     if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传签到凭证', icon: 'none' }); return; }
     if (needInvoice) {
       if (!companyName || !companyName.trim()) { wx.showToast({ title: '请输入公司名称', icon: 'none' }); return; }
@@ -616,7 +617,7 @@ Page({
       success: (res) => {
         const tempFilePath = res.tempFilePaths[0];
         wx.compressImage({
-          src: tempFilePath, quality: 60,
+          src: tempFilePath, quality: 70, compressedWidth: 800,
           success: (compressRes) => {
             wx.cloud.uploadFile({
               cloudPath: `vouchers/${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`,
@@ -659,9 +660,10 @@ Page({
   onViewSignInput(e) {
     const { field } = e.currentTarget.dataset;
     let value = e.detail.value;
-    // 张数只能输入数字
+    // 张数只能输入数字，且至少为1
     if (field === 'months') {
       value = value.replace(/\D/g, '');
+      if (value !== '' && Number(value) < 1) value = '1';
     }
     this.setData({ [`viewSignForm.${field}`]: value });
   },
@@ -682,7 +684,7 @@ Page({
     if (!name || name.trim().length < 2) { wx.showToast({ title: '请输入车主姓名（需与车牌绑定）', icon: 'none', duration: 2000 }); return; }
     if (!phone || !phone.trim()) { wx.showToast({ title: '请输入手机号', icon: 'none' }); return; }
     if (!carNumber || !carNumber.trim()) { wx.showToast({ title: '请输入车牌号', icon: 'none' }); return; }
-    if (!months || Number(months) < 2) { wx.showToast({ title: '请调整张数（至少2张）', icon: 'none' }); return; }
+    if (!months || Number(months) < 1) { wx.showToast({ title: '请调整张数（至少1张）', icon: 'none' }); return; }
     if (hasTransfer && !voucherUrl) { wx.showToast({ title: '请上传签到凭证', icon: 'none' }); return; }
     if (needInvoice) {
       if (!companyName || !companyName.trim()) { wx.showToast({ title: '请输入公司名称', icon: 'none' }); return; }
@@ -826,54 +828,37 @@ Page({
   onCloseExportConfirm() { this.setData({ showExportConfirm: false }); },
 
   onConfirmExport() {
-    wx.showLoading({ title: '正在生成Excel...' });
-    try {
-      let participants = this.data.participants;
-      if (this.data.exportOnlyTransferred) {
-        participants = participants.filter(p => p.hasTransfer);
-      }
+    wx.showLoading({ title: '正在生成...' });
+    const activityTitle = (this.data.activity && this.data.activity.title) || '活动';
+    const monthlyPrice = this.data.monthlyPrice || 0;
+    const onlyTransferred = this.data.exportOnlyTransferred;
 
-      const monthlyPrice = this.data.monthlyPrice || 0;
-      const headers = ['序号', '姓名', '手机号', '车牌号', '月数', '应付金额', '已转账', '生效日期', '发票信息'];
-      const esc = v => {
-        const s = String(v || '');
-        return /[,"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-      };
-      const rows = participants.map((p, i) => {
-        let invoiceText = '';
-        if (p.needInvoice) {
-          const parts = [
-            `发票类型:${p.invoiceType || ''}`,
-            `公司名称:${p.companyName || ''}`,
-            `税号:${p.taxNumber || ''}`,
-            `邮箱:${p.email || ''}`,
-          ];
-          invoiceText = parts.join('\r\n');
-        }
-        const amount = (p.months || 0) * monthlyPrice;
-        return [
-          i + 1, p.name || '', p.phone || '', p.carNumber || '',
-          p.months || 0, amount.toFixed(2),
-          p.hasTransfer ? '是' : '否',
-          p.effectDate || '顺延', invoiceText
-        ].map(esc).join(',');
-      }).join('\n');
-
-      const activityTitle = (this.data.activity && this.data.activity.title) || '活动';
-      const csv = '\uFEFF' + headers.map(esc).join(',') + '\n' + rows;
-
-      const fileName = `${activityTitle}_${Date.now()}.csv`;
-      const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
-      const fs = wx.getFileSystemManager();
-      fs.writeFileSync(filePath, csv, 'utf-8');
-
-      wx.hideLoading();
-      this.setData({ showExportConfirm: false, showExportResult: true, exportResultSuccess: true, exportErrorMsg: '', exportFilePath: filePath });
-    } catch (err) {
-      console.error('导出Excel失败:', err);
-      wx.hideLoading();
-      this.setData({ showExportConfirm: false, showExportResult: true, exportResultSuccess: false, exportErrorMsg: err.message || '导出过程中出现错误' });
+    let participants = this.data.participants || [];
+    if (onlyTransferred) {
+      participants = participants.filter(p => p.hasTransfer);
     }
+
+    const price = Number(monthlyPrice) || 0;
+
+    // 直接使用页面加载时已获取的临时链接 (_voucherTempUrl)
+    let csv = '\uFEFF序号,姓名,手机号,车牌号,月数,应付金额,已转账,生效日期,发票信息,凭证链接\n';
+    participants.forEach((p, i) => {
+      const amount = (Number(p.months) || 0) * price;
+      let invoice = '';
+      if (p.needInvoice) {
+        invoice = `发票类型:${p.invoiceType || ''};公司:${p.companyName || ''};税号:${p.taxNumber || ''};邮箱:${p.email || ''}`;
+      }
+      const link = p._voucherTempUrl || p.voucherUrl || '';
+      const esc = (v) => String(v || '').replace(/,/g, '，');
+      csv += `${i + 1},${esc(p.name)},${esc(p.phone)},${esc(p.carNumber)},${p.months || 0},${amount.toFixed(2)},${p.hasTransfer ? '是' : '否'},${esc(p.effectDate || '顺延')},"${invoice}","${link}"\n`;
+    });
+
+    const fileName = `${activityTitle}_报名表_${Date.now()}.csv`;
+    const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
+    wx.getFileSystemManager().writeFileSync(filePath, csv, 'utf8');
+
+    wx.hideLoading();
+    this.setData({ showExportConfirm: false, showExportResult: true, exportResultSuccess: true, exportErrorMsg: '', exportFilePath: filePath });
   },
 
   onOpenFile() {

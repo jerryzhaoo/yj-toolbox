@@ -403,6 +403,7 @@ Page({
           try {
             await db.collection('banners').doc(banner._id).remove();
             wx.showToast({ title: '已删除', icon: 'success' });
+            cache.remove('banners');
             this.loadBanners();
           } catch (err) {
             wx.showToast({ title: '删除失败', icon: 'error' });
@@ -503,6 +504,7 @@ Page({
       wx.hideLoading();
       wx.showToast({ title: '保存成功', icon: 'success' });
       this.setData({ showBannerEditor: false });
+      cache.remove('banners');
       this.loadBanners();
     } catch (err) {
       wx.hideLoading();

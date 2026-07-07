@@ -1800,3 +1800,19 @@
   font-size: 48rpx;
   color: #9CA3AF;
 }
+
+/* 字数计数 */
+.char-count {
+  text-align: right;
+  margin-top: 6rpx;
+  padding: 0 4rpx;
+}
+.char-count text {
+  font-size: 24rpx;
+}
+.count-warn {
+  color: #EF4444;
+}
+.count-ok {
+  color: #9CA3AF;
+}

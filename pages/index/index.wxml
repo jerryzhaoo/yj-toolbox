@@ -431,7 +431,10 @@
 
         <view class="form-group">
           <text class="form-label"><text class="required-star">*</text>正文（点击banner查看详情）</text>
-          <textarea class="form-textarea" placeholder="请输入正文内容" value="{{bannerEditor.content}}" data-field="content" bindinput="onBannerEditorInput" style="height:200rpx;" />
+          <textarea class="form-textarea" placeholder="请输入正文内容" value="{{bannerEditor.content}}" data-field="content" bindinput="onBannerEditorInput" maxlength="1000" style="height:200rpx;" />
+          <view class="char-count">
+            <text class="{{bannerEditor.content.length >= 1000 ? 'count-warn' : 'count-ok'}}">{{bannerEditor.content.length || 0}}/1000</text>
+          </view>
         </view>
 
         <view class="form-group">

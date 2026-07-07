@@ -260,7 +260,7 @@
           <view class="form-group">
             <text class="form-label"><text class="required-star">*</text>张数</text>
             <view class="input-wrap">
-              <input name="months" type="number" placeholder="张" class="form-input" value="{{signForm.months}}" data-field="months" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <input name="months" type="number" placeholder="张" class="form-input" value="{{signForm.months}}" min="1" data-field="months" bindinput="onSignInput" bindfocus="onFocus" bindblur="onBlur" />
               <view wx:if="{{focusedField === 'months' && signForm.months}}" class="clear-btn" catchtap="onClearSignInput" data-field="months">✕</view>
             </view>
           </view>
@@ -284,7 +284,7 @@
           </view>
         </view>
         <view class="form-group switch-group">
-          <text class="form-label">是否已签到</text>
+          <text class="form-label">上传凭证</text>
           <view class="switch-wrap">
             <text class="switch-label {{signForm.hasTransfer ? '' : 'active'}}">否</text>
             <switch class="transfer-switch" checked="{{signForm.hasTransfer}}" data-field="hasTransfer" bindchange="onSignInput" color="#3B82F6" />
@@ -449,7 +449,7 @@
           <view class="form-group">
             <text class="form-label"><text class="required-star">*</text>张数</text>
             <view class="input-wrap">
-              <input name="months" type="number" placeholder="张" class="form-input" value="{{viewSignForm.months}}" data-field="months" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
+              <input name="months" type="number" placeholder="张" class="form-input" value="{{viewSignForm.months}}" min="1" data-field="months" disabled="{{viewReadonly}}" bindinput="onViewSignInput" bindfocus="onFocus" bindblur="onBlur" />
               <view wx:if="{{focusedField === 'months' && !viewReadonly && viewSignForm.months}}" class="clear-btn" catchtap="onClearViewSignInput" data-field="months">✕</view>
             </view>
           </view>
@@ -478,7 +478,7 @@
           </block>
         </view>
         <view class="form-group switch-group">
-          <text class="form-label">是否已签到</text>
+          <text class="form-label">上传凭证</text>
           <view class="switch-wrap">
             <text class="switch-label {{viewSignForm.hasTransfer ? '' : 'active'}}">否</text>
             <switch class="transfer-switch" checked="{{viewSignForm.hasTransfer}}" data-field="hasTransfer" disabled="{{viewReadonly}}" bindchange="onViewSignInput" color="#3B82F6" />
