@@ -44,12 +44,12 @@ Page({
 
   async onLoad(options) {
     const isAdmin = await this.checkAdmin();
-    // 非管理员直接跳回首页
+    // 非管理员直接跳回首页，不渲染任何发布相关内容
     if (!isAdmin) {
       wx.switchTab({ url: '/pages/index/index' });
       return;
     }
-    
+
     if (options.edit && options.id) {
       // 编辑模式
       const editData = await this.loadEditData(options.id);

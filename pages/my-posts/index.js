@@ -10,6 +10,13 @@ Page({
   },
 
   async onLoad(options) {
+    // 隐藏普通用户的「我发布的/我参与的」入口内容（审核要求）
+    const isAdmin = await this.checkAdmin();
+    if (!isAdmin) {
+      wx.switchTab({ url: '/pages/index/index' });
+      return;
+    }
+
     if (options.title) {
       this.setData({ title: decodeURIComponent(options.title) });
       wx.setNavigationBarTitle({ title: decodeURIComponent(options.title) });
@@ -17,6 +24,31 @@ Page({
     if (options.type) {
       this.setData({ type: options.type });
       await this.loadPosts(options.type);
+    }
+  },
+
+  // 检查管理员身份
+  async checkAdmin() {
+    try {
+      const openidRes = await wx.cloud.callFunction({ name: 'getOpenid' });
+      const openid = openidRes.result.openid;
+      if (!openid) return false;
+      // 先查缓存
+      const cached = app.getAdminCache(openid);
+      if (cached) return cached.isAdmin;
+      // 缓存未命中，查库
+      const res = await db.collection('admins').where({ _openid: openid }).limit(1).get();
+      if (res.data.length > 0) {
+        app.setAdminCache(openid, { isAdmin: true, isSuperAdmin: res.data[0].role === 'super' });
+        return true;
+      }
+      // 兼容邀请码激活
+      const res2 = await db.collection('admins').where({ openid: openid, activated: true }).limit(1).get();
+      const isAdmin = res2.data.length > 0;
+      app.setAdminCache(openid, { isAdmin, isSuperAdmin: isAdmin && res2.data[0].role === 'super' });
+      return isAdmin;
+    } catch (err) {
+      return false;
     }
   },
 

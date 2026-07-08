@@ -1,5 +1,5 @@
 <view class="page">
-  <view class="content">
+  <view class="content" wx:if="{{!loading}}">
     <!-- 列表内容 -->
     <block wx:if="{{posts.length > 0}}">
       <!-- 活动列表 -->
@@ -92,5 +92,9 @@
         </text>
       </view>
     </block>
+  </view>
+  <!-- 加载中（兜底，普通用户会被 onLoad 跳走） -->
+  <view wx:else class="loading-state" style="text-align:center;padding:80rpx 0;color:#999;font-size:28rpx;">
+    <text>加载中...</text>
   </view>
 </view>
