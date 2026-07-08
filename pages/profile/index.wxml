@@ -19,13 +19,13 @@
       </view>
     </view>
 
-    <!-- 统计数据块（仅管理员可见，审核要求普通用户隐藏发布相关内容） -->
-    <view class="stats-block" wx:if="{{isAdmin}}">
-      <view class="stat-item" bindtap="onMyPosts">
+    <!-- 统计数据块 -->
+    <view class="stats-block">
+      <view class="stat-item" bindtap="onMyPosts" wx:if="{{isAdmin}}">
         <text class="stat-count">{{userData.myPostsCount}}</text>
         <text class="stat-label">我发布的</text>
       </view>
-      <view class="stat-divider"></view>
+      <view class="stat-divider" wx:if="{{isAdmin}}"></view>
       <view class="stat-item" bindtap="onMyJoined">
         <text class="stat-count">{{userData.myJoinedCount}}</text>
         <text class="stat-label">我参与的</text>
