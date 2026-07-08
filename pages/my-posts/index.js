@@ -10,11 +10,13 @@ Page({
   },
 
   async onLoad(options) {
-    // 隐藏普通用户的「我发布的/我参与的」入口内容（审核要求）
-    const isAdmin = await this.checkAdmin();
-    if (!isAdmin) {
-      wx.switchTab({ url: '/pages/index/index' });
-      return;
+    // 「我发布的」仅管理员可访问（审核要求），「我参与的」所有人可访问
+    if (options.type === 'posts') {
+      const isAdmin = await this.checkAdmin();
+      if (!isAdmin) {
+        wx.switchTab({ url: '/pages/index/index' });
+        return;
+      }
     }
 
     if (options.title) {
