@@ -840,18 +840,43 @@ Page({
 
     const price = Number(monthlyPrice) || 0;
 
-    // 直接使用页面加载时已获取的临时链接 (_voucherTempUrl)
-    let csv = '\uFEFF序号,姓名,手机号,车牌号,月数,应付金额,已转账,生效日期,发票信息,凭证链接\n';
+    // 导出列按"月卡在职证明"模板排列，并在表头前加 3 行抬头文本
+    const headerRows = [
+      'XXX公司',
+      '在职证明',
+      '兹证明以下人员均为本单位正式员工，烦请贵司协助办理停车月卡团购事宜',
+    ];
+    const colHeader = '序号,普通月卡类型（9折/85折）,车牌,姓名,车主电话,楼栋号,团购月数（个）,生效日期（月卡有效期内顺延，新办请填写日期）,备注,应付金额,凭证链接';
+    let csv = '\uFEFF' + headerRows.map(t => `${t},,,,,,,,,,`).join('\n') + '\n' + colHeader + '\n';
+
+    let totalMonths = 0;
+    let totalAmount = 0;
     participants.forEach((p, i) => {
-      const amount = (Number(p.months) || 0) * price;
+      const months = Number(p.months) || 0;
+      const amount = months * price;
+      totalMonths += months;
+      totalAmount += amount;
       let invoice = '';
       if (p.needInvoice) {
-        invoice = `发票类型:${p.invoiceType || ''};公司:${p.companyName || ''};税号:${p.taxNumber || ''};邮箱:${p.email || ''}`;
+        invoice = `发票:${p.invoiceType || ''};公司:${p.companyName || ''};税号:${p.taxNumber || ''};邮箱:${p.email || ''}`;
       }
       const link = p._voucherTempUrl || p.voucherUrl || '';
       const esc = (v) => String(v || '').replace(/,/g, '，');
-      csv += `${i + 1},${esc(p.name)},${esc(p.phone)},${esc(p.carNumber)},${p.months || 0},${amount.toFixed(2)},${p.hasTransfer ? '是' : '否'},${esc(p.effectDate || '顺延')},"${invoice}","${link}"\n`;
+      csv += `${i + 1},普通月卡（85折）,${esc(p.carNumber)},${esc(p.name)},${esc(p.phone)},,${months},${esc(p.effectDate || '顺延')},${esc(invoice)},${amount.toFixed(2)},${link}\n`;
     });
+
+    // 底部：合计、优惠说明、公章、日期
+    const empty11 = ',,,,,,,,,,';
+    csv += `合计,,,,,,${totalMonths},,,${totalAmount.toFixed(2)},\n`;
+    csv += `注：团购月卡优惠（600元月卡）${empty11}\n`;
+    csv += `1. 同一企业或单位一次性购买月卡20张（含）以上的给予9折优惠，即单张月卡540元；${empty11}\n`;
+    csv += `2. 同一企业或单位一次性购买40张（含）以上的给予85折优惠，即单张月卡510元。${empty11}\n`;
+    csv += `3. 办理需一次性付款，需提供参与人的在司证明并加盖公章。（优惠月卡不予退费）${empty11}\n`;
+    csv += `${empty11}\n`;
+    csv += `${empty11}\n`;
+    csv += `${empty11.substring(0, empty11.length - 1)}XXX公司\n`;
+    csv += `${empty11.substring(0, empty11.length - 1)}（单位公章）\n`;
+    csv += `${empty11.substring(0, empty11.length - 1)}日期：2024年X月X日\n`;
 
     const fileName = `${activityTitle}_报名表_${Date.now()}.csv`;
     const filePath = `${wx.env.USER_DATA_PATH}/${fileName}`;
