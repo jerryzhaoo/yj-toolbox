@@ -46,9 +46,11 @@ Page({
     const isAdmin = await this.checkAdmin();
     // 非管理员直接跳回首页，不渲染任何发布相关内容
     if (!isAdmin) {
-      wx.switchTab({ url: '/pages/index/index' });
+      wx.reLaunch({ url: '/pages/index/index' });
       return;
     }
+    // 管理员确认后才显示标题
+    wx.setNavigationBarTitle({ title: '发布' });
 
     if (options.edit && options.id) {
       // 编辑模式
