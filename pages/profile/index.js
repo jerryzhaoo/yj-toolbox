@@ -186,7 +186,7 @@ Page({
       wx.showToast({ title: '仅管理员可发布', icon: 'none' });
       return;
     }
-    wx.navigateTo({ url: '/pages/edit/index' });
+    wx.navigateTo({ url: '/pages/create/index' });
   },
   goToHome() { wx.switchTab({ url: '/pages/index/index' }); },
   goToProfileSelf() { wx.pageScrollTo({ scrollTop: 0 }); },

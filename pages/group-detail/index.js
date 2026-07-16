@@ -902,7 +902,7 @@ Page({
   onCloseExportResult() { this.setData({ showExportResult: false }); },
 
   onEdit() {
-    wx.navigateTo({ url: `/pages/edit/index?edit=1&id=${this.data.activityId}` });
+    wx.navigateTo({ url: `/pages/create/index?edit=1&id=${this.data.activityId}` });
   },
 
   getCardStyle(index) {
