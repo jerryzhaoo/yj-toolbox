@@ -4,7 +4,7 @@
     "pages/profile/index",
     "pages/group-detail/index",
     "pages/post-detail/index",
-    "pages/publish/index",
+    "pages/edit/index",
     "pages/my-posts/index",
     "pages/user-info-edit/index",
     "pages/init-data/index",

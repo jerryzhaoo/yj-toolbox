@@ -515,7 +515,7 @@ Page({
   // ====== 发布 & 导航 ======
   onPublishClick() {
     if (!this.data.isAdmin) return;
-    wx.navigateTo({ url: '/pages/publish/index' });
+    wx.navigateTo({ url: '/pages/edit/index' });
   },
 
   goToProfile() {
@@ -587,7 +587,7 @@ Page({
     this.setData({ showContextMenu: false });
     const dataStr = JSON.stringify(activity);
     wx.navigateTo({
-      url: `/pages/publish/index?edit=1&copy=${encodeURIComponent(dataStr)}`
+      url: `/pages/edit/index?edit=1&copy=${encodeURIComponent(dataStr)}`
     });
   },
 

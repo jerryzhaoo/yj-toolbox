@@ -227,7 +227,7 @@ Page({
   // 编辑帖子
   onEdit() {
     wx.navigateTo({
-      url: `/pages/publish/index?edit=1&id=${this.data.postId}`
+      url: `/pages/edit/index?edit=1&id=${this.data.postId}`
     });
   },
 

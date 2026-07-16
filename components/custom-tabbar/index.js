@@ -39,7 +39,7 @@ Component({
     },
     onCenterTap() {
       wx.navigateTo({
-        url: '/pages/publish/index'
+        url: '/pages/edit/index'
       });
     }
   }
