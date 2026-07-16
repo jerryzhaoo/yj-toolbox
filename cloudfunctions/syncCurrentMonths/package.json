@@ -1,0 +1,9 @@
+{
+  "name": "syncCurrentMonths",
+  "version": "1.0.0",
+  "description": "定时修复活动 currentMonths 字段",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

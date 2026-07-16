@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "triggers": [
+    {
+      "name": "syncCurrentMonthsTrigger",
+      "type": "timer",
+      "config": "0 0 3 * * * *"
+    }
+  ]
+}
